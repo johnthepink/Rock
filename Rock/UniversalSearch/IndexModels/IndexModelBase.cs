@@ -279,5 +279,9 @@ namespace Rock.UniversalSearch.IndexModels
 
             return false;
         }
+
+        #region Static Methods
+
+        #endregion
     }
 }

@@ -18,7 +18,9 @@
                         <asp:LinkButton ID="btnSearch" CssClass="btn btn-primary" runat="server" OnClick="btnSearch_Click">Go</asp:LinkButton>
                     </span>
                 </div>
-
+                <div class="form-horizontal">
+                <Rock:RockCheckBoxList ID="cblEntities" runat="server" RepeatDirection="Horizontal" Label="Search" For />
+                </div>
                                 
                 <div class="margin-t-md">
                     <asp:Literal ID="lResults" runat="server" />

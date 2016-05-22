@@ -150,6 +150,39 @@ namespace Rock.Model
             }
         }
 
+        /// <summary>
+        /// Gets the name of the get index model.
+        /// </summary>
+        /// <value>
+        /// The name of the get index model.
+        /// </value>
+        public Type GetIndexModelType
+        {
+            get
+            {
+                Type type = null;
+                if ( !string.IsNullOrWhiteSpace( this.AssemblyName ) )
+                {
+                    type = Type.GetType( this.AssemblyName );
+                }
+
+                if ( type != null )
+                {
+                    if ( typeof( IRockIndexable ).IsAssignableFrom( type ) )
+                    {
+                        var constructor = type.GetConstructor( Type.EmptyTypes );
+                        object instance = constructor.Invoke( new object[] { } );
+                        var method = type.GetMethod( "IndexModelName" );
+                        var indexModelName = (Type)method.Invoke( instance, null );
+
+                        return indexModelName;
+                    }
+                }
+
+                return null;
+            }
+        }
+
         #endregion
 
         #region virtual Properties

@@ -269,6 +269,11 @@ namespace Rock.Model
             base.PreSaveChanges( dbContext, state );
         }
 
+
+
+        #endregion
+
+        #region Index Methods
         /// <summary>
         /// Bulks the index items.
         /// </summary>
@@ -297,7 +302,7 @@ namespace Rock.Model
         /// Bulks the index documents by content channel.
         /// </summary>
         /// <param name="contentChannelId">The content channel identifier.</param>
-        public void BulkIndexDocumentsByContentChannel(int contentChannelId )
+        public void BulkIndexDocumentsByContentChannel( int contentChannelId )
         {
             List<ContentChannelItemIndex> indexableChannelItems = new List<ContentChannelItemIndex>();
 
@@ -325,18 +330,22 @@ namespace Rock.Model
             IndexContainer.DeleteDocumentsByType<ContentChannelItemIndex>();
         }
 
-        public void DeleteIndexedDocumentsByContentChannel(int contentChannelId )
+        public void DeleteIndexedDocumentsByContentChannel( int contentChannelId )
         {
             var contentItems = new ContentChannelItemService( new RockContext() ).Queryable().AsNoTracking()
                                     .Where( i => i.ContentChannelId == contentChannelId );
 
-            foreach( var item in contentItems )
+            foreach ( var item in contentItems )
             {
                 var indexableChannelItem = ContentChannelItemIndex.LoadByModel( item );
                 IndexContainer.DeleteDocument<ContentChannelItemIndex>( indexableChannelItem );
             }
         }
 
+        public Type IndexModelName()
+        {
+            return typeof(ContentChannelItemIndex);
+        }
         #endregion
     }
 

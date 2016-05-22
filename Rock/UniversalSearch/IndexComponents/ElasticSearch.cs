@@ -10,6 +10,8 @@ using Nest;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Rock.Attribute;
+using Rock.Data;
+using Rock.Model;
 using Rock.UniversalSearch.IndexModels;
 
 namespace Rock.UniversalSearch.IndexComponents
@@ -67,6 +69,7 @@ namespace Rock.UniversalSearch.IndexComponents
         {
             var node = new Uri( GetAttributeValue( "NodeUrl" ) );
             var config = new ConnectionSettings( node );
+            config.DisableDirectStreaming();
             _client = new ElasticClient( config );
         }
 
@@ -131,24 +134,32 @@ namespace Rock.UniversalSearch.IndexComponents
             _client.DeleteIndex( indexName );
         }
 
-        public override IEnumerable<SearchResultModel> Search( string query, SearchType searchType = SearchType.ExactMatch )
+        public override IEnumerable<SearchResultModel> Search( string query, SearchType searchType = SearchType.ExactMatch, List<int> entities = null )
         {
             ISearchResponse<dynamic> results = null;
             List<SearchResultModel> searchResults = new List<SearchResultModel>();
 
             if (searchType == SearchType.ExactMatch )
             {
-                results = _client.Search<dynamic>( d =>
-                                     d.AllIndices()
-                                     .AllTypes()
-                                     .Query( q => q.QueryString( s => s.Query( query ) ) )
-                                    .Highlight(h => 
-                                        h.Fields( f => 
-                                            f.Field( "*" ).PreTags("<em>").PostTags("</em>")
-                                        )
-                                     )
-                                     //.Explain( true ) // todo remove before flight 
-                                );
+                var searchDescriptor = new SearchDescriptor<dynamic>().AllIndices();
+
+                if (entities == null || entities.Count == 0 )
+                {
+                    searchDescriptor = searchDescriptor.AllTypes();
+                }
+                else
+                {
+                    foreach( var entityId in entities )
+                    {
+                        // get entities search model name
+                        var entityType = new EntityTypeService( new RockContext() ).Get( entityId );
+                        searchDescriptor = searchDescriptor.Type(entityType.GetIndexModelType);
+                    }
+                }
+
+                searchDescriptor = searchDescriptor.Query( q => q.QueryString( s => s.Query( query ) ) );
+
+                results = _client.Search<dynamic>( searchDescriptor );
             }
             else
             {
@@ -160,6 +171,8 @@ namespace Rock.UniversalSearch.IndexComponents
                                     .Explain( true ) // todo remove before flight 
                                 );
             }
+
+            //var presults = _client.Search<PersonIndex>( s => s.AllIndices().Query( q => q.QueryString( qs => qs.Query( query ) ) ) );
 
             // normallize the results to rock search results
             if (results != null )
@@ -176,7 +189,7 @@ namespace Rock.UniversalSearch.IndexComponents
                         if ( hit.Source != null )
                         {
 
-                            Type indexModelType = Type.GetType( (string)((JObject)hit.Source)["indexModelType"] );
+                            /*Type indexModelType = Type.GetType( (string)((JObject)hit.Source)["indexModelType"] );
 
                             if ( indexModelType != null )
                             {
@@ -185,7 +198,7 @@ namespace Rock.UniversalSearch.IndexComponents
                             else
                             {
                                 searchResult.Document = ((JObject)hit.Source).ToObject<IndexModelBase>(); // return the source document as the base type
-                            }
+                            }*/
                         }
 
                         if ( hit.Explanation != null )

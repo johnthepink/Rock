@@ -2325,6 +2325,11 @@ namespace Rock.Model
             IndexContainer.DeleteDocumentsByType<PersonIndex>();
             IndexContainer.DeleteDocumentsByType<BusinessIndex>();
         }
+
+        public Type IndexModelName()
+        {
+            return typeof(PersonIndex);
+        }
         #endregion
     }
 

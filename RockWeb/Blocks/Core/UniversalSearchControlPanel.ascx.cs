@@ -263,7 +263,7 @@ namespace RockWeb.Blocks.Core
             using ( RockContext rockContext = new RockContext() ) {
                 var entities = new EntityTypeService( rockContext ).Queryable().AsNoTracking().ToList();
 
-                var indexableEntities = entities.Where( e => e.IsIndexingSupported == true ).ToList(); ;
+                var indexableEntities = entities.Where( e => e.IsIndexingSupported == true ).ToList();
 
                 gEntityList.DataSource = indexableEntities;
                 gEntityList.DataBind();

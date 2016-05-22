@@ -29,6 +29,7 @@ using Rock.Web.Cache;
 using Rock.Web.UI.Controls;
 using Rock.Attribute;
 using Rock.UniversalSearch;
+using System.Data.Entity;
 
 namespace RockWeb.Blocks.Cms
 {
@@ -83,7 +84,14 @@ namespace RockWeb.Blocks.Cms
 
             if ( !Page.IsPostBack )
             {
-                // added for your convenience
+                var entities = new EntityTypeService( new RockContext() ).Queryable().AsNoTracking().ToList();
+
+                var indexableEntities = entities.Where( i => i.IsIndexingSupported == true ).ToList();
+
+                cblEntities.DataTextField = "FriendlyName";
+                cblEntities.DataValueField = "Id";
+                cblEntities.DataSource = indexableEntities;
+                cblEntities.DataBind();
             }
         }
 
@@ -123,7 +131,7 @@ namespace RockWeb.Blocks.Cms
 
             var client = IndexContainer.GetActiveComponent();
 
-            var results = client.Search( term, SearchType.ExactMatch );
+            var results = client.Search( term, SearchType.ExactMatch, cblEntities.SelectedValuesAsInt );
 
             foreach ( var result in results )
             {

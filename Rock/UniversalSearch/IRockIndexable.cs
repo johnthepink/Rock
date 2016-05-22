@@ -9,8 +9,20 @@ namespace Rock.UniversalSearch
 {
     interface IRockIndexable
     {
-       void BulkIndexDocuments();
+        /// <summary>
+        /// Bulks the index documents.
+        /// </summary>
+        void BulkIndexDocuments();
 
+        /// <summary>
+        /// Deletes the indexed documents.
+        /// </summary>
         void DeleteIndexedDocuments();
+
+        /// <summary>
+        /// Indexes the name of the model.
+        /// </summary>
+        /// <returns></returns>
+        Type IndexModelName();
     }
 }
