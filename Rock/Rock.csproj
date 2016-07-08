@@ -563,6 +563,8 @@
     <Compile Include="UniversalSearch\IndexComponents\ElasticSearch.cs" />
     <Compile Include="UniversalSearch\IndexContainer.cs" />
     <Compile Include="UniversalSearch\IndexComponent.cs" />
+    <Compile Include="UniversalSearch\IndexModels\Attributes\IndexField.cs" />
+    <Compile Include="UniversalSearch\IndexModels\Attributes\IndexBoost.cs" />
     <Compile Include="UniversalSearch\IndexModels\BusinessIndex.cs" />
     <Compile Include="UniversalSearch\IndexModels\PersonIndex.cs" />
     <Compile Include="UniversalSearch\IndexModels\ContentChannelItemIndex.cs" />

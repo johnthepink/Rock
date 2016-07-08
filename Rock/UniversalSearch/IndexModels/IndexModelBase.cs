@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Rock.Attribute;
 using Rock.Model;
 using Rock.Web.Cache;
+using Rock.UniversalSearch.IndexModels.Attributes;
 
 namespace Rock.UniversalSearch.IndexModels
 {
@@ -35,6 +36,7 @@ namespace Rock.UniversalSearch.IndexModels
 
         public string SourceIndexModel { get; set; }
 
+        [IndexField(FieldType = IndexFieldType.NotIndexed)]
         public string IndexModelType {
             get
             {
@@ -72,6 +74,7 @@ namespace Rock.UniversalSearch.IndexModels
             InstanceType = this.GetType();
         }
 
+        [IndexField( FieldType = IndexFieldType.NotIndexed )]
         public virtual string IconCssClass
         {
             get

@@ -4,15 +4,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Rock.Model;
+using Rock.UniversalSearch.IndexModels.Attributes;
 
 namespace Rock.UniversalSearch.IndexModels
 {
     public class PersonIndex : IndexModelBase
     {
-        public string NameShort { get; set; }
-        public string NameLong { get; set; }
         public string RecordStatus { get; set; }
 
+        [IndexBoost(Level = 2)]
+        public string FirstName { get; set; }
+
+        [IndexBoost( Level = 2 )]
+        public string NickName { get; set; }
+
+        [IndexBoost( Level = 5 )]
+        public string LastName { get; set; }
+
+        [Newtonsoft.Json.JsonIgnore]
         public override string IconCssClass
         {
             get
@@ -27,8 +36,10 @@ namespace Rock.UniversalSearch.IndexModels
             personIndex.SourceIndexModel = "Rock.Model.Person";
 
             personIndex.Id = person.Id;
-            personIndex.NameShort = person.NickName + " " + person.LastName;
-            personIndex.NameLong = person.FirstName + " " + person.MiddleName + " " + person.LastName;
+            personIndex.FirstName = person.FirstName;
+            personIndex.NickName = person.NickName;
+            personIndex.LastName = person.LastName;
+            //personIndex.NameLong = person.FirstName + " " + person.MiddleName + " " + person.LastName;
             personIndex.RecordStatus = person.RecordStatusValue != null ? person.RecordStatusValue.Value : "Unknown";
 
             AddIndexableAttributes( personIndex, person );
@@ -53,7 +64,7 @@ namespace Rock.UniversalSearch.IndexModels
                 }
             }
 
-            return new FormattedSearchResult() { IsViewAllowed = true, FormattedResult = string.Format( "<a href='{0}{1}'>{2}</a>", url, this.Id, this.NameShort ) };
+            return new FormattedSearchResult() { IsViewAllowed = true, FormattedResult = string.Format( "<a href='{0}{1}'>{2}</a>", url, this.Id, this.NickName + " " + this.LastName ) };
         }
     }
 }

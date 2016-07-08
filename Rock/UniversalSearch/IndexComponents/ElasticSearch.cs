@@ -49,6 +49,20 @@ namespace Rock.UniversalSearch.IndexComponents
         }
 
         /// <summary>
+        /// Gets the client.
+        /// </summary>
+        /// <value>
+        /// The client.
+        /// </value>
+        public ElasticClient Client
+        {
+            get
+            {
+                return _client;
+            }
+        }
+
+        /// <summary>
         /// Gets the index location.
         /// </summary>
         /// <value>
@@ -123,6 +137,27 @@ namespace Rock.UniversalSearch.IndexComponents
             }
 
             _client.Delete<T>( document, d => d.Index( indexName ) );
+        }
+
+        public override void CreateIndex<T>(string indexName = null)
+        {
+            Type typeParameterType = typeof( T );
+            object instance = Activator.CreateInstance( typeParameterType );
+
+            if (instance is IndexModelBase )
+            {
+                var model = (IndexModelBase)instance;
+
+                var response = _client.CreateIndex( "personindex", t => t
+                 .Mappings( ms => ms.Map<PersonIndex>( m => m.Properties( ps => ps
+                                    .String( s => s.Name( c => c.FirstName ) )
+                                    .String( s => s.Name( c => c.LastName ).Boost( 5 ) )
+                                    .String( s => s.Name( c => c.IconCssClass ).Index( FieldIndexOption.No ) )
+                                    )
+                                )
+                            )
+                        );
+            }
         }
 
         /// <summary>

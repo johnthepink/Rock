@@ -27,6 +27,7 @@
                 </div>
             </div>
         
+            <asp:LinkButton ID="btnTest" runat="server" CssClass="btn btn-primary" OnClick="btnTest_Click" Text="Tester" />
         </asp:Panel>
 
     </ContentTemplate>
