@@ -31,12 +31,13 @@ namespace Rock.UniversalSearch.IndexModels
         }
         PropertyInfo[] _InstancePropertyInfo;
 
-
+        [RockIndexField( Type = IndexFieldType.Number, Index = IndexType.NotIndexed )]
         public int Id { get; set; }
 
+        [RockIndexField( Index = IndexType.NotIndexed )]
         public string SourceIndexModel { get; set; }
 
-        [IndexField(FieldType = IndexFieldType.NotIndexed)]
+        [RockIndexField(Index = IndexType.NotIndexed)]
         public string IndexModelType {
             get
             {
@@ -74,7 +75,7 @@ namespace Rock.UniversalSearch.IndexModels
             InstanceType = this.GetType();
         }
 
-        [IndexField( FieldType = IndexFieldType.NotIndexed )]
+        [RockIndexField( Index = IndexType.NotIndexed )]
         public virtual string IconCssClass
         {
             get
@@ -207,7 +208,7 @@ namespace Rock.UniversalSearch.IndexModels
                     // try to get from properties collection first
                     return _members[key];
                 }
-                catch ( KeyNotFoundException ex )
+                catch ( KeyNotFoundException )
                 {
                     // try reflection on instanceType
                     object result = null;

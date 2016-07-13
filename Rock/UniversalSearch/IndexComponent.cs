@@ -37,9 +37,9 @@ namespace Rock.UniversalSearch
 
         public abstract void DeleteDocumentsByType<T>( string indexName = null ) where T : class, new();
 
-        public abstract void CreateIndex<T>( string indexNmae = null ) where T : class, new();
+        public abstract void CreateIndex( Type documentType );
 
-        public abstract void DeleteIndex( string indexName );
+        public abstract void DeleteIndex( Type documentType );
 
         public abstract void DeleteDocument<T>( T document, string indexName = null ) where T : class, new();
 

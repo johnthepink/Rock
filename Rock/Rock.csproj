@@ -302,6 +302,7 @@
     <Compile Include="Follow\SuggestionContainer.cs" />
     <Compile Include="Follow\EventContainer.cs" />
     <Compile Include="Jobs\CalculateFamilyAnalytics.cs" />
+    <Compile Include="Jobs\IndexRockSite.cs" />
     <Compile Include="Jobs\SendFollowingEvents.cs" />
     <Compile Include="Jobs\SendFollowingSuggestions.cs" />
     <Compile Include="Jobs\SendRegistrationPaymentReminders.cs" />
@@ -493,6 +494,9 @@
     <Compile Include="Model\ScheduleService.Partial.cs" />
     <Compile Include="Model\WorkflowActionService.Partial.cs" />
     <Compile Include="Model\GroupMemberWorkflowTrigger.cs" />
+    <Compile Include="Net\Crawler.cs" />
+    <Compile Include="Net\LinkParser.cs" />
+    <Compile Include="Net\CrawledPage.cs" />
     <Compile Include="Net\RockWebRequest.cs" />
     <Compile Include="PersonProfile\Badge\AlertNote.cs" />
     <Compile Include="PersonProfile\Badge\GeofencedByGroup.cs" />
@@ -563,8 +567,7 @@
     <Compile Include="UniversalSearch\IndexComponents\ElasticSearch.cs" />
     <Compile Include="UniversalSearch\IndexContainer.cs" />
     <Compile Include="UniversalSearch\IndexComponent.cs" />
-    <Compile Include="UniversalSearch\IndexModels\Attributes\IndexField.cs" />
-    <Compile Include="UniversalSearch\IndexModels\Attributes\IndexBoost.cs" />
+    <Compile Include="UniversalSearch\IndexModels\Attributes\RockIndexField.cs" />
     <Compile Include="UniversalSearch\IndexModels\BusinessIndex.cs" />
     <Compile Include="UniversalSearch\IndexModels\PersonIndex.cs" />
     <Compile Include="UniversalSearch\IndexModels\ContentChannelItemIndex.cs" />

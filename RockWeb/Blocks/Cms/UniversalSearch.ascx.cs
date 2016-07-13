@@ -155,7 +155,7 @@ namespace RockWeb.Blocks.Cms
                 {
                     // get entities search model name
                     var entityType = new EntityTypeService( new RockContext() ).Get( entityId );
-                    entityTypes.Add( entityType.GetIndexModelType.Name.ToLower() );
+                    entityTypes.Add( entityType.IndexModelType.Name.ToLower() );
                 }
 
                 searchDescriptor = searchDescriptor.Type( string.Join(",", entityTypes) ); // todo: considter adding indexmodeltype to the entity cache
@@ -235,69 +235,6 @@ namespace RockWeb.Blocks.Cms
                 }
             }
             return searchResults;
-        }
-
-
-
-        protected void btnTest_Click( object sender, EventArgs e )
-        {
-            ElasticSearch search = new ElasticSearch();
-            ElasticClient _client = search.Client;
-
-            /*var indexDescriptor = new TypeMappingDescriptor<PersonIndex>();
-            indexDescriptor.Properties( ps => ps.String( s => s.Name( "FirstName" ).Boost( 5 ) ) );
-            indexDescriptor.Properties( ps => ps.String( s => s.Name( "LastName" ).Boost( 10 ) ) );
-
-            var test3 = new
-            test3.Name = "FirstName";
-
-            var typeMapping = new TypeMapping();
-            typeMapping.Properties.Add(;
-
-            var indexRequest = new CreateIndexRequest();
-            indexRequest.Mappings.Add( "personindex", indexDescriptor );
-            var response3 = _client.CreateIndex(indexRequest);*/
-
-            /*var response = _client.CreateIndex( "personindex", t => t
-                 .Mappings( ms => ms.Map<PersonIndex>( m => m.Properties( ps => ps
-                                    .String( s => s.Name( "FirstName" ) )
-                                    .String( s => s.Name( "LastName" ).Boost(5) )
-                                    .String( s => s.Name( "IconCssClass" ).Index(FieldIndexOption.No))
-                                    )
-                                )
-                            )
-                        );*/
-
-
-            /*var createIndexRequest = new CreateIndexRequest("personindex");
-            createIndexRequest.Mappings = new Mappings();
-
-            var typeMapping = new TypeMapping();
-            typeMapping.Properties = new Properties();
-            typeMapping.Properties.Add( "firstName", new StringProperty() { Name = "FirstName", Boost = 2 } );
-            typeMapping.Properties.Add( "lastName", new StringProperty() { Name = "LastName", Boost = 4 } );
-            typeMapping.Properties.Add( "iconCssClass", new StringProperty() { Name = "IconCssClass", Index = FieldIndexOption.No } );
-
-            createIndexRequest.Mappings.Add( "personindex", typeMapping );
-
-            var response = _client.CreateIndex( createIndexRequest );*/
-
-            /*var putMapRequest = new PutMappingRequest("personindex", "personindex");
-            putMapRequest.Properties = new Properties();
-            putMapRequest.Properties.Add( "firstName", new StringProperty() { Name = "FirstName", Boost = 2 } );
-            putMapRequest.Properties.Add( "lastName", new StringProperty() { Name = "LastName", Boost = 15 } );
-            putMapRequest.Properties.Add( "iconCssClass", new StringProperty() { Name = "IconCssClass", Index = FieldIndexOption.No} );
-            var putResponse = _client.Map( putMapRequest );*/
-
-
-
-            var response2 = _client.Map<PersonIndex>( m => m.Index("personindex").Properties( ps => ps
-                                     .String( s => s.Name( c => c.FirstName ) )
-                                     .String( s => s.Name( c => c.LastName ).Boost( 15 ) ) ) );
-
-            var result = _client.GetMapping<PersonIndex>();
-
-            //http://stackoverflow.com/questions/35350490/create-index-with-multi-field-mapping-syntax-with-nest-2-x
         }
     }
 }

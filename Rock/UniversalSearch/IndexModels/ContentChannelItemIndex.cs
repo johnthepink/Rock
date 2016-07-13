@@ -5,21 +5,40 @@ using System.Text;
 using System.Threading.Tasks;
 using Rock.Data;
 using Rock.Model;
+using Rock.UniversalSearch.IndexModels.Attributes;
 
 namespace Rock.UniversalSearch.IndexModels
 {
     public class ContentChannelItemIndex : IndexModelBase
     {
+        [RockIndexField]
         public string Title { get; set; }
+
+        [RockIndexField]
         public string Content { get; set; }
+
+        [RockIndexField( Type = IndexFieldType.Number, Index = IndexType.NotIndexed)]
         public int ContentChannelId { get; set; }
+
+        [RockIndexField( Type = IndexFieldType.Number, Index = IndexType.NotIndexed )]
         public int Priority { get; set; }
+
+        [RockIndexField( Type = IndexFieldType.String, Index = IndexType.NotIndexed )]
         public string Status { get; set; }
+
+        [RockIndexField( Type = IndexFieldType.Date )]
         public DateTime StartDate { get; set; }
+
+        [RockIndexField( Type = IndexFieldType.Date )]
         public DateTime? ExpireDate { get; set; }
+
+        [RockIndexField( Type = IndexFieldType.String, Index = IndexType.NotIndexed )]
         public string Permalink { get; set; }
+
+        [RockIndexField( Type = IndexFieldType.Boolean, Index = IndexType.NotIndexed )]
         public bool IsApproved { get; set; }
 
+        [RockIndexField( Type = IndexFieldType.String, Index = IndexType.NotIndexed )]
         public override string IconCssClass
         {
             get

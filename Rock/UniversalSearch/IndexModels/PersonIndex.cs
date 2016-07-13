@@ -10,18 +10,19 @@ namespace Rock.UniversalSearch.IndexModels
 {
     public class PersonIndex : IndexModelBase
     {
+        [RockIndexField]
         public string RecordStatus { get; set; }
 
-        [IndexBoost(Level = 2)]
+        [RockIndexField( Boost = 2 )]
         public string FirstName { get; set; }
 
-        [IndexBoost( Level = 2 )]
+        [RockIndexField( Boost = 2 )]
         public string NickName { get; set; }
 
-        [IndexBoost( Level = 5 )]
+        [RockIndexField( Boost = 5 )]
         public string LastName { get; set; }
 
-        [Newtonsoft.Json.JsonIgnore]
+        [RockIndexField( Index = IndexType.NotIndexed )]
         public override string IconCssClass
         {
             get

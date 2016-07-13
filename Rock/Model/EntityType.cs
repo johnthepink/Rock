@@ -156,7 +156,7 @@ namespace Rock.Model
         /// <value>
         /// The name of the get index model.
         /// </value>
-        public Type GetIndexModelType
+        public Type IndexModelType
         {
             get
             {

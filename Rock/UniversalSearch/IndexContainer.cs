@@ -93,6 +93,10 @@ namespace Rock.UniversalSearch
         protected override IEnumerable<Lazy<IndexComponent, IComponentData>> MEFComponents { get; set; }
 
 
+        /// <summary>
+        /// Indexes the documents.
+        /// </summary>
+        /// <param name="documents">The documents.</param>
         public static void IndexDocuments( IEnumerable<IndexModelBase> documents )
         {
             foreach ( var indexType in IndexContainer.Instance.Components )
@@ -108,6 +112,10 @@ namespace Rock.UniversalSearch
             }
         }
 
+        /// <summary>
+        /// Deletes the type of the documents by.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
         public static void DeleteDocumentsByType<T>() where T : class, new()
         {
             foreach ( var indexType in IndexContainer.Instance.Components )
@@ -120,6 +128,12 @@ namespace Rock.UniversalSearch
             }
         }
 
+        /// <summary>
+        /// Deletes the document.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="document">The document.</param>
+        /// <param name="indexName">Name of the index.</param>
         public static void DeleteDocument<T>(T document, string indexName = null ) where T : class, new()
         {
             foreach ( var indexType in IndexContainer.Instance.Components )
@@ -132,14 +146,34 @@ namespace Rock.UniversalSearch
             }
         }
 
-        public static void DeleteIndex(string indexName )
+        /// <summary>
+        /// Creates the index.
+        /// </summary>
+        /// <param name="documentType">Type of the document.</param>
+        public static void CreateIndex(Type documentType)
         {
             foreach ( var indexType in IndexContainer.Instance.Components )
             {
                 var component = indexType.Value.Value;
                 if ( component.IsActive && component.IsConnected )
                 {
-                    component.DeleteIndex(indexName);
+                    component.CreateIndex( documentType );
+                }
+            }
+        }
+
+        /// <summary>
+        /// Deletes the index.
+        /// </summary>
+        /// <param name="indexName">Name of the index.</param>
+        public static void DeleteIndex(Type documentType )
+        {
+            foreach ( var indexType in IndexContainer.Instance.Components )
+            {
+                var component = indexType.Value.Value;
+                if ( component.IsActive && component.IsConnected )
+                {
+                    component.DeleteIndex( documentType );
                 }
             }
         }

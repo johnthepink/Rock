@@ -126,6 +126,15 @@ namespace RockWeb.Blocks.Core
 
                 rockContext.SaveChanges();
 
+                if ( cbEnabledIndexing.Checked )
+                {
+                    IndexContainer.CreateIndex( entityType.IndexModelType );
+                }
+                else
+                {
+                    IndexContainer.DeleteIndex( entityType.IndexModelType );
+                }
+
                 // flush item from cache
                 EntityTypeCache.Flush( entityType.Id );
             }

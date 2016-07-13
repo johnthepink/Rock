@@ -13,6 +13,7 @@ using Rock.Attribute;
 using Rock.Data;
 using Rock.Model;
 using Rock.UniversalSearch.IndexModels;
+using Rock.UniversalSearch.IndexModels.Attributes;
 
 namespace Rock.UniversalSearch.IndexComponents
 {
@@ -139,24 +140,89 @@ namespace Rock.UniversalSearch.IndexComponents
             _client.Delete<T>( document, d => d.Index( indexName ) );
         }
 
-        public override void CreateIndex<T>(string indexName = null)
+        /// <summary>
+        /// Creates the index.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="indexName">Name of the index.</param>
+        public override void CreateIndex(Type documentType)
         {
-            Type typeParameterType = typeof( T );
-            object instance = Activator.CreateInstance( typeParameterType );
+            var indexName = documentType.Name.ToLower();
 
+            object instance = Activator.CreateInstance( documentType );
+
+            // check if index already exists if so delete it
+            var existsResponse = _client.IndexExists( indexName );
+
+            if ( existsResponse.Exists )
+            {
+                this.DeleteIndex( documentType );
+            }
+
+            // make sure this is an index document
             if (instance is IndexModelBase )
             {
+                // create a new index request
+                var createIndexRequest = new CreateIndexRequest( indexName );
+                createIndexRequest.Mappings = new Mappings();
+
+                var typeMapping = new TypeMapping();
+                typeMapping.Properties = new Properties();
+
+                createIndexRequest.Mappings.Add( indexName, typeMapping );
+
                 var model = (IndexModelBase)instance;
 
-                var response = _client.CreateIndex( "personindex", t => t
-                 .Mappings( ms => ms.Map<PersonIndex>( m => m.Properties( ps => ps
-                                    .String( s => s.Name( c => c.FirstName ) )
-                                    .String( s => s.Name( c => c.LastName ).Boost( 5 ) )
-                                    .String( s => s.Name( c => c.IconCssClass ).Index( FieldIndexOption.No ) )
-                                    )
-                                )
-                            )
-                        );
+                // get properties from the model and add them to the index (hint: attributes will be added dynamically as the documents are loaded)
+                var modelProperties = documentType.GetProperties();
+
+                foreach(var property in modelProperties )
+                {
+                    var indexAttributes = property.GetCustomAttributes(false);
+                    var indexAttribute = property.GetCustomAttributes( typeof( RockIndexField ), false );
+                    if(indexAttribute.Length > 0 )
+                    {
+                        var attribute = (RockIndexField)indexAttribute[0];
+                        
+                        var propertyName = Char.ToLowerInvariant( property.Name[0] ) + property.Name.Substring( 1 );
+
+                        // rewrite non-string index option (would be nice if they made the enums match up...)
+                        NonStringIndexOption nsIndexOption = NonStringIndexOption.NotAnalyzed;
+                        if (attribute.Type != IndexFieldType.String )
+                        {
+                            if ( attribute.Index == IndexType.NotIndexed )
+                            {
+                                nsIndexOption = NonStringIndexOption.No;
+                            }
+                        }
+
+                        switch ( attribute.Type )
+                        {
+                            case IndexFieldType.Boolean:
+                                {
+                                    typeMapping.Properties.Add( propertyName, new BooleanProperty() { Name = propertyName, Boost = attribute.Boost, Index = nsIndexOption } );
+                                    break;
+                                }
+                            case IndexFieldType.Date:
+                                {
+                                    typeMapping.Properties.Add( propertyName, new DateProperty() { Name = propertyName, Boost = attribute.Boost, Index = nsIndexOption } );
+                                    break;
+                                }
+                            case IndexFieldType.Number:
+                                {
+                                    typeMapping.Properties.Add( propertyName, new NumberProperty() { Name = propertyName, Boost = attribute.Boost, Index = nsIndexOption } );
+                                    break;
+                                }
+                            default:
+                                {
+                                    typeMapping.Properties.Add( propertyName, new StringProperty() { Name = propertyName, Boost = attribute.Boost, Index = (FieldIndexOption)attribute.Index } );
+                                    break;
+                                }
+                        }
+                    }
+                }
+
+                var response = _client.CreateIndex( createIndexRequest );
             }
         }
 
@@ -164,9 +230,9 @@ namespace Rock.UniversalSearch.IndexComponents
         /// Deletes the index.
         /// </summary>
         /// <param name="indexName">Name of the index.</param>
-        public override void DeleteIndex( string indexName )
+        public override void DeleteIndex( Type documentType )
         {
-            _client.DeleteIndex( indexName );
+            _client.DeleteIndex( documentType.Name.ToLower() );
         }
 
         public override IEnumerable<SearchResultModel> Search( string query, SearchType searchType = SearchType.ExactMatch, List<int> entities = null )
@@ -188,7 +254,7 @@ namespace Rock.UniversalSearch.IndexComponents
                     {
                         // get entities search model name
                         var entityType = new EntityTypeService( new RockContext() ).Get( entityId );
-                        searchDescriptor = searchDescriptor.Type(entityType.GetIndexModelType);
+                        searchDescriptor = searchDescriptor.Type(entityType.IndexModelType);
                     }
                 }
 
