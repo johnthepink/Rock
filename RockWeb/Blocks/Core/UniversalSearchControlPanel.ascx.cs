@@ -248,7 +248,7 @@ namespace RockWeb.Blocks.Core
                     {
                         hlblEnabled.LabelType = LabelType.Warning;
                         nbMessages.NotificationBoxType = NotificationBoxType.Warning;
-                        nbMessages.Text = string.Format( "Could not connect to the ElasticSearch server at {0}.", component.IndexLocation );
+                        nbMessages.Text = string.Format( "Could not connect to the {0} server at {1}.", component.EntityType.FriendlyName, component.IndexLocation );
                     }
 
                     lIndexLocation.Text = component.IndexLocation;

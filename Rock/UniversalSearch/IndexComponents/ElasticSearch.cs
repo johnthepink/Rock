@@ -17,12 +17,12 @@ using Rock.UniversalSearch.IndexModels.Attributes;
 
 namespace Rock.UniversalSearch.IndexComponents
 {
-    [Description( "ElasticSearch Universal Search Index" )]
+    [Description( "Elasticsearch Universal Search Index" )]
     [Export( typeof( IndexComponent ) )]
-    [ExportMetadata( "ComponentName", "ElasticSearch" )]
+    [ExportMetadata( "ComponentName", "Elasticsearch" )]
 
     [TextField( "Node URL", "The URL of the ElasticSearch node (http://myserver:9200)", true, key: "NodeUrl" )]
-    public class ElasticSearch : IndexComponent
+    public class Elasticsearch : IndexComponent
     {
         private ElasticClient _client;
 
@@ -36,6 +36,11 @@ namespace Rock.UniversalSearch.IndexComponents
         {
             get
             {
+                if (_client == null )
+                {
+                    ConnectToServer();
+                }
+
                 if ( _client != null )
                 {
                     var results = _client.ClusterState();
@@ -78,14 +83,25 @@ namespace Rock.UniversalSearch.IndexComponents
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ElasticSearch" /> class.
+        /// Initializes a new instance of the <see cref="Elasticsearch" /> class.
         /// </summary>
-        public ElasticSearch()
+        public Elasticsearch()
         {
-            var node = new Uri( GetAttributeValue( "NodeUrl" ) );
-            var config = new ConnectionSettings( node );
-            config.DisableDirectStreaming();
-            _client = new ElasticClient( config );
+            ConnectToServer();
+        }
+
+        /// <summary>
+        /// Connects to server.
+        /// </summary>
+        private void ConnectToServer()
+        {
+            if ( !string.IsNullOrWhiteSpace( GetAttributeValue( "NodeUrl" ) ) )
+            {
+                var node = new Uri( GetAttributeValue( "NodeUrl" ) );
+                var config = new ConnectionSettings( node );
+                config.DisableDirectStreaming();
+                _client = new ElasticClient( config );
+            }
         }
 
         /// <summary>
