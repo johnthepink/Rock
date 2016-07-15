@@ -37,11 +37,13 @@ namespace Rock.UniversalSearch
 
         public abstract void DeleteDocumentsByType<T>( string indexName = null ) where T : class, new();
 
-        public abstract void CreateIndex( Type documentType );
+        public abstract void CreateIndex( Type documentType, bool deleteIfExists = true );
 
         public abstract void DeleteIndex( Type documentType );
 
         public abstract void DeleteDocument<T>( T document, string indexName = null ) where T : class, new();
+
+        public abstract void DeleteDocumentByProperty( Type documentType, string propertyName, object propertyValue );
 
         public abstract IEnumerable<SearchResultModel> Search( string query, SearchType searchType = SearchType.ExactMatch, List<int> entities = null );
     }

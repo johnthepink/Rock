@@ -92,6 +92,21 @@ namespace Rock.UniversalSearch
         [ImportMany( typeof( IndexComponent ) )]
         protected override IEnumerable<Lazy<IndexComponent, IComponentData>> MEFComponents { get; set; }
 
+        /// <summary>
+        /// Indexes the documents.
+        /// </summary>
+        /// <param name="documents">The documents.</param>
+        public static void IndexDocument( IndexModelBase document )
+        {
+            foreach ( var indexType in IndexContainer.Instance.Components )
+            {
+                var component = indexType.Value.Value;
+                if ( component.IsActive && component.IsConnected )
+                {
+                   component.IndexDocument( document );
+                }
+            }
+        }
 
         /// <summary>
         /// Indexes the documents.
@@ -146,18 +161,30 @@ namespace Rock.UniversalSearch
             }
         }
 
-        /// <summary>
-        /// Creates the index.
-        /// </summary>
-        /// <param name="documentType">Type of the document.</param>
-        public static void CreateIndex(Type documentType)
+        public static void DeleteDocumentByProperty(Type documentType, string propertyName, object propertyValue )
         {
             foreach ( var indexType in IndexContainer.Instance.Components )
             {
                 var component = indexType.Value.Value;
                 if ( component.IsActive && component.IsConnected )
                 {
-                    component.CreateIndex( documentType );
+                    component.DeleteDocumentByProperty( documentType, propertyName, propertyValue );
+                }
+            }
+        }
+
+        /// <summary>
+        /// Creates the index.
+        /// </summary>
+        /// <param name="documentType">Type of the document.</param>
+        public static void CreateIndex(Type documentType, bool deleteIfExists = true)
+        {
+            foreach ( var indexType in IndexContainer.Instance.Components )
+            {
+                var component = indexType.Value.Value;
+                if ( component.IsActive && component.IsConnected )
+                {
+                    component.CreateIndex( documentType, deleteIfExists );
                 }
             }
         }

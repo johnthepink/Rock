@@ -32,7 +32,7 @@ namespace Rock.UniversalSearch.IndexModels
         PropertyInfo[] _InstancePropertyInfo;
 
         [RockIndexField( Type = IndexFieldType.Number, Index = IndexType.NotIndexed )]
-        public int Id { get; set; }
+        public Int64 Id { get; set; }
 
         [RockIndexField( Index = IndexType.NotIndexed )]
         public string SourceIndexModel { get; set; }

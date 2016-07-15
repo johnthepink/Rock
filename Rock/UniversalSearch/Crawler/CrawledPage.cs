@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Rock.Net
+namespace Rock.UniversalSearch.Crawler
 {
     public class CrawledPage
     {
@@ -12,14 +12,18 @@ namespace Rock.Net
         public CrawledPage() { }
 
         #endregion
+
         #region Private Instance Fields
 
         private int _size;
         private string _text;
         private string _url;
         private int _viewstateSize;
+        private string _title;
+        private bool? _allowsIndex;
 
         #endregion
+
         #region Public Properties
 
         public int Size
@@ -49,19 +53,37 @@ namespace Rock.Net
             set { _viewstateSize = value; }
         }
 
-        #endregion
-
-        public void CalculateViewstateSize()
+        public string Title
         {
-            int startingIndex = Text.IndexOf( "id=\"__VIEWSTATE\"" );
-            if ( startingIndex > -1 )
+            get
             {
-                int indexOfViewstateValueNode = Text.IndexOf( "value=\"", startingIndex );
-                int indexOfClosingQuotationMark = Text.IndexOf( "\"", indexOfViewstateValueNode + 7 );
-                string viewstateValue = Text.Substring( indexOfViewstateValueNode + 7, indexOfClosingQuotationMark - (indexOfViewstateValueNode + 7) );
-
-                ViewstateSize = viewstateValue.Length;
+                return _title;
+            }
+            set
+            {
+                _title = value;
             }
         }
+
+        public bool AllowsIndex
+        {
+            get
+            {
+                if (_allowsIndex == null )
+                {
+                    return true;
+                }
+                else
+                {
+                    return _allowsIndex.Value;
+                }
+            }
+            set
+            {
+                _allowsIndex = value;
+            }
+        }
+
+        #endregion
     }
 }

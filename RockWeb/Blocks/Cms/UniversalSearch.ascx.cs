@@ -135,7 +135,7 @@ namespace RockWeb.Blocks.Cms
 
             //var client = IndexContainer.GetActiveComponent();
 
-            ElasticSearch search = new ElasticSearch();
+            Rock.UniversalSearch.IndexComponents.Elasticsearch search = new Rock.UniversalSearch.IndexComponents.Elasticsearch();
             ElasticClient _client = search.Client;
 
             //ISearchResponse<dynamic> results = null;

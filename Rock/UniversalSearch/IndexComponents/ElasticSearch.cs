@@ -161,18 +161,25 @@ namespace Rock.UniversalSearch.IndexComponents
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="indexName">Name of the index.</param>
-        public override void CreateIndex(Type documentType)
+        public override void CreateIndex(Type documentType, bool deleteIfExists = true)
         {
             var indexName = documentType.Name.ToLower();
 
             object instance = Activator.CreateInstance( documentType );
 
-            // check if index already exists if so delete it
+            // check if index already exists
             var existsResponse = _client.IndexExists( indexName );
 
             if ( existsResponse.Exists )
             {
-                this.DeleteIndex( documentType );
+                if ( deleteIfExists )
+                {
+                    this.DeleteIndex( documentType );
+                }
+                else
+                {
+                    return;
+                }
             }
 
             // make sure this is an index document
@@ -332,6 +339,19 @@ namespace Rock.UniversalSearch.IndexComponents
             return searchResults;
 
             
+        }
+
+        public override void DeleteDocumentByProperty( Type documentType, string propertyName, object propertyValue ) {
+
+            string jsonSearch = string.Format( @"{{
+""term"": {{
+      ""{0}"": {{
+                ""value"": ""{1}""
+      }}
+        }}
+}}", Char.ToLowerInvariant( propertyName[0] ) + propertyName.Substring( 1 ), propertyValue );
+
+            var response = _client.DeleteByQuery<IndexModelBase>( documentType.Name.ToLower(), documentType.Name.ToLower(), qd => qd.Query( q => q.Raw( jsonSearch ) ));
         }
     }
 }

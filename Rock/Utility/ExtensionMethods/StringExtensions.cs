@@ -48,6 +48,31 @@ namespace Rock
         }
 
         /// <summary>
+        /// Makes the Int64 hash code from the provided string.
+        /// </summary>
+        /// <param name="str">The string.</param>
+        /// <returns></returns>
+        public static Int64 MakeInt64HashCode( this string str )
+        {
+            // http://www.codeproject.com/Articles/34309/Convert-String-to-64bit-Integer
+            Int64 hashCode = 0;
+            if ( !string.IsNullOrEmpty( str ) )
+            {
+                //Unicode Encode Covering all characterset
+                byte[] byteContents = Encoding.Unicode.GetBytes( str );
+                System.Security.Cryptography.SHA256 hash =
+                new System.Security.Cryptography.SHA256CryptoServiceProvider();
+                byte[] hashText = hash.ComputeHash( byteContents );
+
+                Int64 hashCodeStart = BitConverter.ToInt64( hashText, 0 );
+                Int64 hashCodeMedium = BitConverter.ToInt64( hashText, 8 );
+                Int64 hashCodeEnd = BitConverter.ToInt64( hashText, 24 );
+                hashCode = hashCodeStart ^ hashCodeMedium ^ hashCodeEnd;
+            }
+            return (hashCode);
+        }
+
+        /// <summary>
         /// removes any invalid FileName chars in a filename
         /// from http://stackoverflow.com/a/14836763/1755417
         /// </summary>

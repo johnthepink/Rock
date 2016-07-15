@@ -32,6 +32,7 @@ using System.Data.Entity;
 using Rock.UniversalSearch;
 using System.Reflection;
 using Rock.UniversalSearch.IndexModels;
+using Rock.Transactions;
 
 namespace RockWeb.Blocks.Core
 {
@@ -189,20 +190,20 @@ namespace RockWeb.Blocks.Core
         protected void gBulkLoad_Click( object sender, RowEventArgs e )
         {
             var entityType = EntityTypeCache.Read( e.RowKeyId );
-            Type type = entityType.GetEntityType();
 
-            if ( type != null )
+            if (entityType != null )
             {
-                object classInstance = Activator.CreateInstance( type, null );
-                MethodInfo bulkItemsMethod = type.GetMethod( "BulkIndexDocuments" );
+                BulkIndexEntityTypeTransaction bulkIndexTransaction = new BulkIndexEntityTypeTransaction();
+                bulkIndexTransaction.EntityTypeId = entityType.Id;
 
-                if ( classInstance != null && bulkItemsMethod != null )
-                {
-                    bulkItemsMethod.Invoke( classInstance, null );
-                }
+                RockQueue.TransactionQueue.Enqueue( bulkIndexTransaction );
+
+                maMessages.Show( string.Format("A request has been sent to index {0}.", entityType.FriendlyName.Pluralize()), ModalAlertType.Information );
             }
-
-            maMessages.Show( string.Format("A request has been sent to index {0}.", entityType.FriendlyName.Pluralize()), ModalAlertType.Information );
+            else
+            {
+                maMessages.Show( "An error occurred launching the bulk index request. Could not find the entity type.", ModalAlertType.Alert );
+            }
         }
 
         /// <summary>

@@ -109,7 +109,7 @@ namespace Rock.UniversalSearch.IndexModels
             if ( !isSecurityDisabled )
             {
                 // check security
-                var contentChannelItem = new ContentChannelItemService( new RockContext() ).Get( this.Id );
+                var contentChannelItem = new ContentChannelItemService( new RockContext() ).Get( (int)this.Id );
                 var isAllowedView = contentChannelItem.IsAuthorized( "View", person );
 
                 if ( !isAllowedView )
