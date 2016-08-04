@@ -17,7 +17,7 @@ namespace Rock.UniversalSearch.IndexModels
         [RockIndexField]
         public string Content { get; set; }
 
-        [RockIndexField( Type = IndexFieldType.Number, Index = IndexType.NotIndexed)]
+        [RockIndexField( Type = IndexFieldType.Number)]
         public int ContentChannelId { get; set; }
 
         [RockIndexField( Type = IndexFieldType.Number, Index = IndexType.NotIndexed )]
@@ -35,7 +35,7 @@ namespace Rock.UniversalSearch.IndexModels
         [RockIndexField( Type = IndexFieldType.String, Index = IndexType.NotIndexed )]
         public string Permalink { get; set; }
 
-        [RockIndexField( Type = IndexFieldType.Boolean, Index = IndexType.NotIndexed )]
+        [RockIndexField( Type = IndexFieldType.Boolean )]
         public bool IsApproved { get; set; }
 
         [RockIndexField( Type = IndexFieldType.String, Index = IndexType.NotIndexed )]
@@ -110,7 +110,12 @@ namespace Rock.UniversalSearch.IndexModels
             {
                 // check security
                 var contentChannelItem = new ContentChannelItemService( new RockContext() ).Get( (int)this.Id );
-                var isAllowedView = contentChannelItem.IsAuthorized( "View", person );
+                var isAllowedView = false;
+
+                if (contentChannelItem != null )
+                {
+                    isAllowedView = contentChannelItem.IsAuthorized( "View", person );
+                }
 
                 if ( !isAllowedView )
                 {

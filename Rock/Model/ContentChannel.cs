@@ -34,7 +34,7 @@ namespace Rock.Model
     /// </summary>
     [Table( "ContentChannel" )]
     [DataContract]
-    public partial class ContentChannel : Model<ContentChannel>, IRockIndexable
+    public partial class ContentChannel : Model<ContentChannel>
     {
 
         #region Entity Properties
@@ -222,6 +222,48 @@ namespace Rock.Model
 
         #region Methods
 
+        #region Index Methods
+        /// <summary>
+        /// Deletes the indexed documents by content channel.
+        /// </summary>
+        /// <param name="contentChannelId">The content channel identifier.</param>
+        public void DeleteIndexedDocumentsByContentChannel( int contentChannelId )
+        {
+            var contentItems = new ContentChannelItemService( new RockContext() ).Queryable().AsNoTracking()
+                                    .Where( i => i.ContentChannelId == contentChannelId );
+
+            foreach ( var item in contentItems )
+            {
+                var indexableChannelItem = ContentChannelItemIndex.LoadByModel( item );
+                IndexContainer.DeleteDocument<ContentChannelItemIndex>( indexableChannelItem );
+            }
+        }
+
+        /// <summary>
+        /// Bulks the index documents by content channel.
+        /// </summary>
+        /// <param name="contentChannelId">The content channel identifier.</param>
+        public void BulkIndexDocumentsByContentChannel( int contentChannelId )
+        {
+            List<ContentChannelItemIndex> indexableChannelItems = new List<ContentChannelItemIndex>();
+
+            // return all approved content channel items that are in content channels that should be indexed
+            RockContext rockContext = new RockContext();
+            var contentChannelItems = new ContentChannelItemService( rockContext ).Queryable().AsNoTracking()
+                                            .Where( i =>
+                                                i.ContentChannelId == contentChannelId
+                                                && (i.ContentChannel.RequiresApproval == false || i.Status == ContentChannelItemStatus.Approved) );
+
+            foreach ( var item in contentChannelItems )
+            {
+                var indexableChannelItem = ContentChannelItemIndex.LoadByModel( item );
+                indexableChannelItems.Add( indexableChannelItem );
+            }
+
+            IndexContainer.IndexDocuments( indexableChannelItems );
+        }
+        #endregion
+
         /// <summary>
         /// Returns a <see cref="System.String" /> that represents this instance.
         /// </summary>
@@ -271,81 +313,6 @@ namespace Rock.Model
 
 
 
-        #endregion
-
-        #region Index Methods
-        /// <summary>
-        /// Bulks the index items.
-        /// </summary>
-        /// <returns></returns>
-        public void BulkIndexDocuments()
-        {
-            List<ContentChannelItemIndex> indexableChannelItems = new List<ContentChannelItemIndex>();
-
-            // return all approved content channel items that are in content channels that should be indexed
-            RockContext rockContext = new RockContext();
-            var contentChannelItems = new ContentChannelItemService( rockContext ).Queryable().AsNoTracking()
-                                            .Where( i =>
-                                                i.ContentChannel.IsIndexEnabled
-                                                && (i.ContentChannel.RequiresApproval == false || i.Status == ContentChannelItemStatus.Approved) );
-
-            foreach ( var item in contentChannelItems )
-            {
-                var indexableChannelItem = ContentChannelItemIndex.LoadByModel( item );
-                indexableChannelItems.Add( indexableChannelItem );
-            }
-
-            IndexContainer.IndexDocuments( indexableChannelItems );
-        }
-
-        /// <summary>
-        /// Bulks the index documents by content channel.
-        /// </summary>
-        /// <param name="contentChannelId">The content channel identifier.</param>
-        public void BulkIndexDocumentsByContentChannel( int contentChannelId )
-        {
-            List<ContentChannelItemIndex> indexableChannelItems = new List<ContentChannelItemIndex>();
-
-            // return all approved content channel items that are in content channels that should be indexed
-            RockContext rockContext = new RockContext();
-            var contentChannelItems = new ContentChannelItemService( rockContext ).Queryable().AsNoTracking()
-                                            .Where( i =>
-                                                i.ContentChannelId == contentChannelId
-                                                && (i.ContentChannel.RequiresApproval == false || i.Status == ContentChannelItemStatus.Approved) );
-
-            foreach ( var item in contentChannelItems )
-            {
-                var indexableChannelItem = ContentChannelItemIndex.LoadByModel( item );
-                indexableChannelItems.Add( indexableChannelItem );
-            }
-
-            IndexContainer.IndexDocuments( indexableChannelItems );
-        }
-
-        /// <summary>
-        /// Deletes the indexed documents.
-        /// </summary>
-        public void DeleteIndexedDocuments()
-        {
-            IndexContainer.DeleteDocumentsByType<ContentChannelItemIndex>();
-        }
-
-        public void DeleteIndexedDocumentsByContentChannel( int contentChannelId )
-        {
-            var contentItems = new ContentChannelItemService( new RockContext() ).Queryable().AsNoTracking()
-                                    .Where( i => i.ContentChannelId == contentChannelId );
-
-            foreach ( var item in contentItems )
-            {
-                var indexableChannelItem = ContentChannelItemIndex.LoadByModel( item );
-                IndexContainer.DeleteDocument<ContentChannelItemIndex>( indexableChannelItem );
-            }
-        }
-
-        public Type IndexModelName()
-        {
-            return typeof(ContentChannelItemIndex);
-        }
         #endregion
     }
 

@@ -161,6 +161,12 @@ namespace Rock.UniversalSearch
             }
         }
 
+        /// <summary>
+        /// Deletes the document by property.
+        /// </summary>
+        /// <param name="documentType">Type of the document.</param>
+        /// <param name="propertyName">Name of the property.</param>
+        /// <param name="propertyValue">The property value.</param>
         public static void DeleteDocumentByProperty(Type documentType, string propertyName, object propertyValue )
         {
             foreach ( var indexType in IndexContainer.Instance.Components )
@@ -169,6 +175,23 @@ namespace Rock.UniversalSearch
                 if ( component.IsActive && component.IsConnected )
                 {
                     component.DeleteDocumentByProperty( documentType, propertyName, propertyValue );
+                }
+            }
+        }
+
+        /// <summary>
+        /// Deletes the document by identifier.
+        /// </summary>
+        /// <param name="documentType">Type of the document.</param>
+        /// <param name="id">The identifier.</param>
+        public static void DeleteDocumentById( Type documentType, int id )
+        {
+            foreach ( var indexType in IndexContainer.Instance.Components )
+            {
+                var component = indexType.Value.Value;
+                if ( component.IsActive && component.IsConnected )
+                {
+                    component.DeleteDocumentById( documentType, id );
                 }
             }
         }

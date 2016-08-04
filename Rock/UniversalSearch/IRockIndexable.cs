@@ -15,6 +15,18 @@ namespace Rock.UniversalSearch
         void BulkIndexDocuments();
 
         /// <summary>
+        /// Indexes the document.
+        /// </summary>
+        /// <param name="Id">The identifier.</param>
+        void IndexDocument( int id );
+
+        /// <summary>
+        /// Deletes the indexed document.
+        /// </summary>
+        /// <param name="Id">The identifier.</param>
+        void DeleteIndexedDocument( int id );
+
+        /// <summary>
         /// Deletes the indexed documents.
         /// </summary>
         void DeleteIndexedDocuments();
@@ -23,6 +35,6 @@ namespace Rock.UniversalSearch
         /// Indexes the name of the model.
         /// </summary>
         /// <returns></returns>
-        Type IndexModelName();
+        Type IndexModelType();
     }
 }

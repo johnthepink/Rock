@@ -31,7 +31,7 @@ namespace Rock.UniversalSearch.IndexModels
         }
         PropertyInfo[] _InstancePropertyInfo;
 
-        [RockIndexField( Type = IndexFieldType.Number, Index = IndexType.NotIndexed )]
+        [RockIndexField( Type = IndexFieldType.Number )]
         public Int64 Id { get; set; }
 
         [RockIndexField( Index = IndexType.NotIndexed )]

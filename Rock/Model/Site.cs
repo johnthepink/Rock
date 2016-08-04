@@ -513,9 +513,19 @@ namespace Rock.Model
             IndexContainer.DeleteDocumentsByType<SitePageIndex>();
         }
 
-        public Type IndexModelName()
+        public Type IndexModelType()
         {
             return typeof( SitePageIndex );
+        }
+
+        public void IndexDocument( int id )
+        {
+            return;
+        }
+
+        public void DeleteIndexedDocument( int id )
+        {
+            return;
         }
 
         /// <summary>

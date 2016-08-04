@@ -19,9 +19,13 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration;
+using System.Linq;
 using System.Runtime.Serialization;
 using Rock.Data;
+using Rock.UniversalSearch;
+using Rock.UniversalSearch.IndexModels;
 
 namespace Rock.Model
 {
@@ -30,7 +34,7 @@ namespace Rock.Model
     /// </summary>
     [Table( "ContentChannelItem")]
     [DataContract]
-    public partial class ContentChannelItem : Model<ContentChannelItem>
+    public partial class ContentChannelItem : Model<ContentChannelItem>, IRockIndexable
     {
 
         #region Entity Properties
@@ -202,6 +206,54 @@ namespace Rock.Model
 
         #region Methods
 
+        #region Index Methods
+        public void BulkIndexDocuments()
+        {
+            List<ContentChannelItemIndex> indexableChannelItems = new List<ContentChannelItemIndex>();
+
+            // return all approved content channel items that are in content channels that should be indexed
+            RockContext rockContext = new RockContext();
+            var contentChannelItems = new ContentChannelItemService( rockContext ).Queryable().AsNoTracking()
+                                            .Where( i =>
+                                                i.ContentChannel.IsIndexEnabled
+                                                && (i.ContentChannel.RequiresApproval == false || i.Status == ContentChannelItemStatus.Approved) );
+
+            foreach ( var item in contentChannelItems )
+            {
+                var indexableChannelItem = ContentChannelItemIndex.LoadByModel( item );
+                indexableChannelItems.Add( indexableChannelItem );
+            }
+
+            IndexContainer.IndexDocuments( indexableChannelItems );
+        }
+
+        public void IndexDocument( int id )
+        {
+            var itemEntity = new ContentChannelItemService( new RockContext() ).Get( id );
+
+            // ensure it's meant to be indexed
+            if (itemEntity.ContentChannel.IsIndexEnabled && (itemEntity.ContentChannel.RequiresApproval == false || itemEntity.Status == ContentChannelItemStatus.Approved) )
+            {
+                var indexItem = ContentChannelItemIndex.LoadByModel( itemEntity );
+                IndexContainer.IndexDocument( indexItem );
+            }
+        }
+
+        public void DeleteIndexedDocument( int id )
+        {
+            IndexContainer.DeleteDocumentById( this.IndexModelType(), id );
+        }
+
+        public void DeleteIndexedDocuments()
+        {
+            IndexContainer.DeleteDocumentsByType<ContentChannelItemIndex>();
+        }
+
+        public Type IndexModelType()
+        {
+            return typeof( ContentChannelItemIndex );
+        }
+        #endregion
         #endregion
     }
 

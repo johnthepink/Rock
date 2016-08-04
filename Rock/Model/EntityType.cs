@@ -172,10 +172,13 @@ namespace Rock.Model
                     {
                         var constructor = type.GetConstructor( Type.EmptyTypes );
                         object instance = constructor.Invoke( new object[] { } );
-                        var method = type.GetMethod( "IndexModelName" );
-                        var indexModelName = (Type)method.Invoke( instance, null );
+                        var method = type.GetMethod( "IndexModelType" );
 
-                        return indexModelName;
+                        if ( method != null )
+                        {
+                            var indexModelType = (Type)method.Invoke( instance, null );
+                            return indexModelType;
+                        }
                     }
                 }
 

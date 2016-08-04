@@ -125,6 +125,12 @@ namespace Rock.UniversalSearch.Crawler
                 }
             }
 
+            // check for links to GetFile
+            if (link.Contains( "GetFile.ashx" ) )
+            {
+                return LinkType.File;
+            }
+
             foreach(string test in interalLinkStartsWith )
             {
                 if ( link.StartsWith( test, StringComparison.OrdinalIgnoreCase ) )
@@ -276,6 +282,6 @@ namespace Rock.UniversalSearch.Crawler
 
         }*/
 
-        private enum LinkType { Internal, External, NonLink }
+        private enum LinkType { Internal, External, NonLink, File }
     }
 }

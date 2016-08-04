@@ -35,6 +35,7 @@ using Nest;
 using Rock.UniversalSearch.IndexComponents;
 using Newtonsoft.Json.Linq;
 using Rock.UniversalSearch.IndexModels;
+using System.Text;
 
 namespace RockWeb.Blocks.Cms
 {
@@ -133,7 +134,7 @@ namespace RockWeb.Blocks.Cms
         {
             lResults.Text = string.Empty;
 
-            //var client = IndexContainer.GetActiveComponent();
+            var client = IndexContainer.GetActiveComponent();
 
             Rock.UniversalSearch.IndexComponents.Elasticsearch search = new Rock.UniversalSearch.IndexComponents.Elasticsearch();
             ElasticClient _client = search.Client;
@@ -141,44 +142,10 @@ namespace RockWeb.Blocks.Cms
             //ISearchResponse<dynamic> results = null;
             List<int> entities = cblEntities.SelectedValuesAsInt;
 
-            // START EXACT SEARCH
-            var searchDescriptor = new SearchDescriptor<dynamic>().AllIndices();
+            var results = client.Search( term, SearchType.ExactMatch, cblEntities.SelectedValuesAsInt );
 
-            if ( entities == null || entities.Count == 0 )
-            {
-                searchDescriptor = searchDescriptor.AllTypes();
-            }
-            else
-            {
-                var entityTypes = new List<string>();
-                foreach ( var entityId in entities )
-                {
-                    // get entities search model name
-                    var entityType = new EntityTypeService( new RockContext() ).Get( entityId );
-                    entityTypes.Add( entityType.IndexModelType.Name.ToLower() );
-                }
-
-                searchDescriptor = searchDescriptor.Type( string.Join(",", entityTypes) ); // todo: considter adding indexmodeltype to the entity cache
-            }
-            searchDescriptor = searchDescriptor.Query( q => q.QueryString( s => s.Query( term ) ) );//.Type(",personindex,"); //<- comma delimited list
-
-            var rawResults = _client.Search<dynamic>( searchDescriptor );
-            // END EXACT SEARCH
-
-            // START FUZZY SEARCH
-            /*var rawResults = _client.Search<dynamic>( d =>
-                                   d.AllIndices().AllTypes()
-                                   .Query( q =>
-                                       q.Fuzzy( f => f.Value( term ) )
-                                   )
-                                   .Explain( true ) // todo remove before flight 
-                               );*/
-            // END FUZZY SEARCH
-
-            var results = TempGetResults( rawResults );
-
-
-            //var results = client.Search( term, SearchType.ExactMatch, cblEntities.SelectedValuesAsInt );
+            StringBuilder formattedResults = new StringBuilder();
+            formattedResults.Append( "<ul class='list-unstyled'>" );
 
             foreach ( var result in results as IEnumerable<SearchResultModel> )
             {
@@ -186,9 +153,13 @@ namespace RockWeb.Blocks.Cms
 
                 if ( formattedResult.IsViewAllowed )
                 {
-                    lResults.Text += string.Format( "<strong>Score</strong> {0} - <i class='{2}'></i> Result: {1} <br /><pre style='xdisplay: none;'>{3}</pre><p>", result.Score, formattedResult.FormattedResult, result.Document.IconCssClass, result.Explain );
+                    formattedResults.Append( string.Format( "<li class='margin-b-md'><i class='{2}'></i> Result: {1} <br />Score {0}</li>", result.Score, formattedResult.FormattedResult, result.Document.IconCssClass ));
                 }
             }
+
+            formattedResults.Append( "</ul>" );
+
+            lResults.Text = formattedResults.ToString();
         }
 
         #endregion

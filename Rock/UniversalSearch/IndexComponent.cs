@@ -43,6 +43,8 @@ namespace Rock.UniversalSearch
 
         public abstract void DeleteDocument<T>( T document, string indexName = null ) where T : class, new();
 
+        public abstract void DeleteDocumentById( Type documentType, int id );
+
         public abstract void DeleteDocumentByProperty( Type documentType, string propertyName, object propertyValue );
 
         public abstract IEnumerable<SearchResultModel> Search( string query, SearchType searchType = SearchType.ExactMatch, List<int> entities = null );

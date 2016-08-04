@@ -2326,9 +2326,59 @@ namespace Rock.Model
             IndexContainer.DeleteDocumentsByType<BusinessIndex>();
         }
 
-        public Type IndexModelName()
+        /// <summary>
+        /// Indexes the name of the model.
+        /// </summary>
+        /// <returns></returns>
+        public Type IndexModelType()
         {
             return typeof(PersonIndex);
+        }
+
+        /// <summary>
+        /// Indexes the document.
+        /// </summary>
+        /// <param name="id"></param>
+        public void IndexDocument( int id )
+        {
+            var personEntity = new PersonService( new RockContext() ).Get( id );
+
+            if (personEntity != null )
+            {
+                if (personEntity.RecordTypeValue.Guid == Rock.SystemGuid.DefinedValue.PERSON_RECORD_TYPE_PERSON.AsGuid() )
+                {
+                    var indexItem = PersonIndex.LoadByModel( personEntity );
+                    IndexContainer.IndexDocument( indexItem );
+                }
+                else if ( personEntity.RecordTypeValue.Guid == Rock.SystemGuid.DefinedValue.PERSON_RECORD_TYPE_BUSINESS.AsGuid() )
+                {
+                    var indexItem = BusinessIndex.LoadByModel( personEntity );
+                    IndexContainer.IndexDocument( indexItem );
+                }
+            }
+        }
+
+        /// <summary>
+        /// Deletes the indexed document.
+        /// </summary>
+        /// <param name="id"></param>
+        public void DeleteIndexedDocument( int id )
+        {
+            var personEntity = new PersonService( new RockContext() ).Get( id );
+
+            if ( personEntity != null )
+            {
+                if ( personEntity.RecordTypeValue.Guid == Rock.SystemGuid.DefinedValue.PERSON_RECORD_TYPE_PERSON.AsGuid() )
+                {
+                    Type indexType = Type.GetType( "Rock.UniversalSearch.IndexModels.PersonIndex" );
+                    IndexContainer.DeleteDocumentById( indexType, id );
+                }
+                else if ( personEntity.RecordTypeValue.Guid == Rock.SystemGuid.DefinedValue.PERSON_RECORD_TYPE_BUSINESS.AsGuid() )
+                {
+                    Type indexType = Type.GetType( "Rock.UniversalSearch.IndexModels.PersonIndex" );
+                    IndexContainer.DeleteDocumentById( indexType, id );
+                }
+            }
         }
         #endregion
     }

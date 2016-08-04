@@ -273,12 +273,15 @@ namespace Rock.UniversalSearch.IndexComponents
                 }
                 else
                 {
-                    foreach( var entityId in entities )
+                    var entityTypes = new List<string>();
+                    foreach ( var entityId in entities )
                     {
                         // get entities search model name
                         var entityType = new EntityTypeService( new RockContext() ).Get( entityId );
-                        searchDescriptor = searchDescriptor.Type(entityType.IndexModelType);
+                        entityTypes.Add( entityType.IndexModelType.Name.ToLower() );
                     }
+
+                    searchDescriptor = searchDescriptor.Type( string.Join( ",", entityTypes ) ); // todo: considter adding indexmodeltype to the entity cache
                 }
 
                 searchDescriptor = searchDescriptor.Query( q => q.QueryString( s => s.Query( query ) ) );
@@ -313,7 +316,7 @@ namespace Rock.UniversalSearch.IndexComponents
                         if ( hit.Source != null )
                         {
 
-                            /*Type indexModelType = Type.GetType( (string)((JObject)hit.Source)["indexModelType"] );
+                            Type indexModelType = Type.GetType( (string)((JObject)hit.Source)["indexModelType"] );
 
                             if ( indexModelType != null )
                             {
@@ -322,7 +325,7 @@ namespace Rock.UniversalSearch.IndexComponents
                             else
                             {
                                 searchResult.Document = ((JObject)hit.Source).ToObject<IndexModelBase>(); // return the source document as the base type
-                            }*/
+                            }
                         }
 
                         if ( hit.Explanation != null )
@@ -352,6 +355,11 @@ namespace Rock.UniversalSearch.IndexComponents
 }}", Char.ToLowerInvariant( propertyName[0] ) + propertyName.Substring( 1 ), propertyValue );
 
             var response = _client.DeleteByQuery<IndexModelBase>( documentType.Name.ToLower(), documentType.Name.ToLower(), qd => qd.Query( q => q.Raw( jsonSearch ) ));
+        }
+
+        public override void DeleteDocumentById( Type documentType, int id )
+        {
+            this.DeleteDocumentByProperty( documentType, "id", id );
         }
     }
 }
