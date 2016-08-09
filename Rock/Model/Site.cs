@@ -1,11 +1,11 @@
 ﻿// <copyright>
 // Copyright by the Spark Development Network
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Rock Community License (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+// http://www.rockrms.com/license
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -322,6 +322,7 @@ namespace Rock.Model
         }
         private bool _allowIndexing = true;
 
+
         /// <summary>
         /// Gets or sets a value indicating whether this instance is index enabled.
         /// </summary>
@@ -340,6 +341,15 @@ namespace Rock.Model
         [DataMember]
         public string IndexStartingLocation { get; set; }
 
+
+        /// <summary>
+        /// Gets or sets a value indicating whether [requires encryption].
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if [requires encryption]; otherwise, <c>false</c>.
+        /// </value>
+        [DataMember]
+        public bool RequiresEncryption { get; set; }
         #endregion
 
         #region Virtual Properties

@@ -1,11 +1,11 @@
-﻿// <copyright>
+// <copyright>
 // Copyright by the Spark Development Network
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Rock Community License (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+// http://www.rockrms.com/license
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -15,6 +15,7 @@
 // </copyright>
 //
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -47,7 +48,7 @@ namespace Rock
             return sb.ToString();
         }
 
-        /// <summary>
+		/// <summary>
         /// Makes the Int64 hash code from the provided string.
         /// </summary>
         /// <param name="str">The string.</param>
@@ -115,8 +116,6 @@ namespace Rock
             char[] delimiter = new char[] { ',' };
             return Regex.Replace( str, regex, "," ).Split( delimiter, StringSplitOptions.RemoveEmptyEntries );
         }
-
-
 
         /// <summary>
         /// Replaces every instance of oldValue (regardless of case) with the newValue.
@@ -212,7 +211,7 @@ namespace Rock
             if ( str == null )
             {
                 return null;
-            }                
+            }
             else if ( str.Length <= length )
             {
                 return str;
@@ -245,8 +244,6 @@ namespace Rock
 
             return truncatedString + "...";
         }
-
-        
 
         /// <summary>
         /// Removes any non-numeric characters.
@@ -310,6 +307,49 @@ namespace Rock
 
             return trueStrings.Contains( str.ToLower() );
         }
+
+        /// <summary>
+        /// Attempts to convert string to an dictionary using the |/comma and ^ delimiter Key/Value syntax.  Returns an empty dictionary if unsuccessful.
+        /// </summary>
+        /// <param name="str">The string.</param>
+        /// <returns></returns>
+        [System.Diagnostics.DebuggerStepThrough()]
+        public static System.Collections.Generic.Dictionary<string, string> AsDictionary( this string str )
+        {
+            var dictionary = new System.Collections.Generic.Dictionary<string, string>();
+            string[] nameValues = str.Split( new char[] { '|' }, StringSplitOptions.RemoveEmptyEntries );
+            // If we haven't found any pipes, check for commas
+            if ( nameValues.Count() == 1 )
+            {
+                nameValues = str.Split( new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries );
+            }
+            foreach ( string nameValue in nameValues )
+            {
+                string[] nameAndValue = nameValue.Split( new char[] { '^' }, 2 );
+                if ( nameAndValue.Count() == 2 )
+                {
+                    dictionary[nameAndValue[0]] = nameAndValue[1];
+                }
+            }
+            return dictionary;
+        }
+
+        /// <summary>
+        /// Attempts to convert string to an dictionary using the |/comma and ^ delimiter Key/Value syntax.  Returns null if unsuccessful.
+        /// </summary>
+        /// <param name="str">The string.</param>
+        /// <returns></returns>
+        [System.Diagnostics.DebuggerStepThrough()]
+        public static System.Collections.Generic.Dictionary<string, string> AsDictionaryOrNull( this string str )
+        {
+            var dictionary = AsDictionary( str );
+            if ( dictionary.Count() > 0 )
+            {
+                return dictionary;
+            }
+            return null;
+        }
+
 
         /// <summary>
         /// Attempts to convert string to integer.  Returns 0 if unsuccessful.
@@ -587,6 +627,32 @@ namespace Rock
             s = Regex.Replace( s, "[\u02DC\u00A0]", " " );
 
             return s;
+        }
+
+        /// <summary>
+        /// Returns a list of KeyValuePairs from a serialized list of Rock KeyValuePairs (e.g. 'Item1^Value1|Item2^Value2')
+        /// </summary>
+        /// <param name="input">The input.</param>
+        /// <returns></returns>
+        public static List<KeyValuePair<string, object>> ToKeyValuePairList( this string input )
+        {
+            List<KeyValuePair<string, object>> keyPairs = new List<KeyValuePair<string, object>>();
+
+            if ( !string.IsNullOrWhiteSpace( input ) )
+            {
+                var items = input.Split( '|' );
+
+                foreach ( var item in items )
+                {
+                    var parts = item.Split( '^' );
+                    if ( parts.Length == 2 )
+                    {
+                        keyPairs.Add( new KeyValuePair<string, object>( parts[0], parts[1] ) );
+                    }
+                }
+            }
+
+            return keyPairs;
         }
 
         #endregion String Extensions

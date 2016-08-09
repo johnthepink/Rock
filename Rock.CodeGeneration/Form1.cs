@@ -44,18 +44,12 @@ namespace Rock.CodeGeneration
                 rockAssembly = typeof( Rock.Data.IEntity ).Assembly;
                 FileInfo fi = new FileInfo( ( new System.Uri( rockAssembly.CodeBase ) ).AbsolutePath );
                 lblAssemblyPath.Text = fi.FullName;
-                lblAssemblyDateTime.Text = fi.LastWriteTime.ToElapsedString();
-                toolTip1.SetToolTip( lblAssemblyDateTime, fi.LastWriteTime.ToString() );
-
-                
             }
 
             ofdAssembly.InitialDirectory = Path.GetDirectoryName( lblAssemblyPath.Text );
             ofdAssembly.Filter = "dll files (*.dll)|*.dll";
             ofdAssembly.FileName = "Rock.dll";
             ofdAssembly.RestoreDirectory = true;
-
-            
 
             if ( ofdAssembly.ShowDialog() == DialogResult.OK )
             {
@@ -65,16 +59,23 @@ namespace Rock.CodeGeneration
 
                 foreach ( var file in ofdAssembly.FileNames )
                 {
-                    lblAssemblyPath.Text = file;
-                    var assembly = Assembly.LoadFrom( file );
-
-                    foreach ( Type type in assembly.GetTypes().OfType<Type>().OrderBy( a => a.FullName ) )
+                    FileInfo fi = new FileInfo( file );
+                    if ( fi.Exists )
                     {
-                        if ( type.Namespace != null && !type.Namespace.StartsWith( "Rock.Data" ) && !type.IsAbstract && type.GetCustomAttribute<NotMappedAttribute>() == null )
+                        lblAssemblyPath.Text = file;
+                        lblAssemblyDateTime.Text = fi.LastWriteTime.ToElapsedString();
+                        toolTip1.SetToolTip( lblAssemblyDateTime, fi.LastWriteTime.ToString() );
+
+                        var assembly = Assembly.LoadFrom( file );
+
+                        foreach ( Type type in assembly.GetTypes().OfType<Type>().OrderBy( a => a.FullName ) )
                         {
-                            if ( typeof( Rock.Data.IEntity ).IsAssignableFrom( type ) || type.GetCustomAttribute( typeof( TableAttribute ) ) != null )
+                            if ( type.Namespace != null && !type.Namespace.StartsWith( "Rock.Data" ) && !type.IsAbstract && type.GetCustomAttribute<NotMappedAttribute>() == null )
                             {
-                                cblModels.Items.Add( type );
+                                if ( typeof( Rock.Data.IEntity ).IsAssignableFrom( type ) || type.GetCustomAttribute( typeof( TableAttribute ) ) != null )
+                                {
+                                    cblModels.Items.Add( type );
+                                }
                             }
                         }
                     }
@@ -298,13 +299,13 @@ namespace Rock.CodeGeneration
             sb.AppendLine( "// </auto-generated>" );
             sb.AppendLine( "//------------------------------------------------------------------------------" );
             sb.AppendLine( "// <copyright>" );
-            sb.AppendLine( "// Copyright 2013 by the Spark Development Network" );
+            sb.AppendLine( "// Copyright by the Spark Development Network" );
             sb.AppendLine( "//" );
-            sb.AppendLine( "// Licensed under the Apache License, Version 2.0 (the \"License\");" );
+            sb.AppendLine( "// Licensed under the Rock Community License (the \"License\");" );
             sb.AppendLine( "// you may not use this file except in compliance with the License." );
             sb.AppendLine( "// You may obtain a copy of the License at" );
             sb.AppendLine( "//" );
-            sb.AppendLine( "// http://www.apache.org/licenses/LICENSE-2.0" );
+            sb.AppendLine( "// http://www.rockrms.com/license" );
             sb.AppendLine( "//" );
             sb.AppendLine( "// Unless required by applicable law or agreed to in writing, software" );
             sb.AppendLine( "// distributed under the License is distributed on an \"AS IS\" BASIS," );
@@ -600,13 +601,13 @@ order by [parentTable], [columnName]
             sb.AppendLine( "// </auto-generated>" );
             sb.AppendLine( "//------------------------------------------------------------------------------" );
             sb.AppendLine( "// <copyright>" );
-            sb.AppendLine( "// Copyright 2013 by the Spark Development Network" );
+            sb.AppendLine( "// Copyright by the Spark Development Network" );
             sb.AppendLine( "//" );
-            sb.AppendLine( "// Licensed under the Apache License, Version 2.0 (the \"License\");" );
+            sb.AppendLine( "// Licensed under the Rock Community License (the \"License\");" );
             sb.AppendLine( "// you may not use this file except in compliance with the License." );
             sb.AppendLine( "// You may obtain a copy of the License at" );
             sb.AppendLine( "//" );
-            sb.AppendLine( "// http://www.apache.org/licenses/LICENSE-2.0" );
+            sb.AppendLine( "// http://www.rockrms.com/license" );
             sb.AppendLine( "//" );
             sb.AppendLine( "// Unless required by applicable law or agreed to in writing, software" );
             sb.AppendLine( "// distributed under the License is distributed on an \"AS IS\" BASIS," );
@@ -851,13 +852,13 @@ order by [parentTable], [columnName]
             sb.AppendLine( "// </auto-generated>" );
             sb.AppendLine( "//------------------------------------------------------------------------------" );
             sb.AppendLine( "// <copyright>" );
-            sb.AppendLine( "// Copyright 2013 by the Spark Development Network" );
+            sb.AppendLine( "// Copyright by the Spark Development Network" );
             sb.AppendLine( "//" );
-            sb.AppendLine( "// Licensed under the Apache License, Version 2.0 (the \"License\");" );
+            sb.AppendLine( "// Licensed under the Rock Community License (the \"License\");" );
             sb.AppendLine( "// you may not use this file except in compliance with the License." );
             sb.AppendLine( "// You may obtain a copy of the License at" );
             sb.AppendLine( "//" );
-            sb.AppendLine( "// http://www.apache.org/licenses/LICENSE-2.0" );
+            sb.AppendLine( "// http://www.rockrms.com/license" );
             sb.AppendLine( "//" );
             sb.AppendLine( "// Unless required by applicable law or agreed to in writing, software" );
             sb.AppendLine( "// distributed under the License is distributed on an \"AS IS\" BASIS," );
@@ -921,13 +922,13 @@ order by [parentTable], [columnName]
             sb.AppendLine( "// </auto-generated>" );
             sb.AppendLine( "//------------------------------------------------------------------------------" );
             sb.AppendLine( "// <copyright>" );
-            sb.AppendLine( "// Copyright 2013 by the Spark Development Network" );
+            sb.AppendLine( "// Copyright by the Spark Development Network" );
             sb.AppendLine( "//" );
-            sb.AppendLine( "// Licensed under the Apache License, Version 2.0 (the \"License\");" );
+            sb.AppendLine( "// Licensed under the Rock Community License (the \"License\");" );
             sb.AppendLine( "// you may not use this file except in compliance with the License." );
             sb.AppendLine( "// You may obtain a copy of the License at" );
             sb.AppendLine( "//" );
-            sb.AppendLine( "// http://www.apache.org/licenses/LICENSE-2.0" );
+            sb.AppendLine( "// http://www.rockrms.com/license" );
             sb.AppendLine( "//" );
             sb.AppendLine( "// Unless required by applicable law or agreed to in writing, software" );
             sb.AppendLine( "// distributed under the License is distributed on an \"AS IS\" BASIS," );
@@ -1024,13 +1025,13 @@ order by [parentTable], [columnName]
             sb.AppendLine( "// </auto-generated>" );
             sb.AppendLine( "//------------------------------------------------------------------------------" );
             sb.AppendLine( "// <copyright>" );
-            sb.AppendLine( "// Copyright 2013 by the Spark Development Network" );
+            sb.AppendLine( "// Copyright by the Spark Development Network" );
             sb.AppendLine( "//" );
-            sb.AppendLine( "// Licensed under the Apache License, Version 2.0 (the \"License\");" );
+            sb.AppendLine( "// Licensed under the Rock Community License (the \"License\");" );
             sb.AppendLine( "// you may not use this file except in compliance with the License." );
             sb.AppendLine( "// You may obtain a copy of the License at" );
             sb.AppendLine( "//" );
-            sb.AppendLine( "// http://www.apache.org/licenses/LICENSE-2.0" );
+            sb.AppendLine( "// http://www.rockrms.com/license" );
             sb.AppendLine( "//" );
             sb.AppendLine( "// Unless required by applicable law or agreed to in writing, software" );
             sb.AppendLine( "// distributed under the License is distributed on an \"AS IS\" BASIS," );

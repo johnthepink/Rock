@@ -1,11 +1,11 @@
 ﻿// <copyright>
 // Copyright by the Spark Development Network
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Rock Community License (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+// http://www.rockrms.com/license
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -400,7 +400,19 @@ namespace Rock.Web.Cache
         /// </summary>
         /// <param name="currentPerson">The current person.</param>
         /// <returns></returns>
+        [Obsolete( "Use Rock.Lava.LavaHelper.GetCommonMergeFields instead" )]
         public static Dictionary<string, object> GetMergeFields( Person currentPerson )
+        {
+            return GetLegacyMergeFields( currentPerson );
+        }
+
+        /// <summary>
+        /// Gets the legacy global attribute values as merge fields for dotLiquid merging.
+        /// Note: You should use LavaHelper.GetCommonMergeFields instead of this
+        /// </summary>
+        /// <param name="currentPerson">The current person.</param>
+        /// <returns></returns>
+        internal static Dictionary<string, object> GetLegacyMergeFields( Person currentPerson )
         {
             var configValues = new Dictionary<string, object>();
 
@@ -602,6 +614,20 @@ namespace Rock.Web.Cache
                 }
 
                 return string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// Gets the lava support level.
+        /// </summary>
+        /// <value>
+        /// The lava support level.
+        /// </value>
+        public Rock.Lava.LavaSupportLevel LavaSupportLevel
+        {
+            get
+            {
+                return GetValue( "core.LavaSupportLevel" ).ConvertToEnumOrNull<Rock.Lava.LavaSupportLevel>() ?? Rock.Lava.LavaSupportLevel.Legacy;
             }
         }
 

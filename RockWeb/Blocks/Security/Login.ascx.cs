@@ -1,11 +1,11 @@
 ﻿// <copyright>
 // Copyright by the Spark Development Network
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Rock Community License (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+// http://www.rockrms.com/license
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -115,7 +115,7 @@ Sorry, your account has been locked.  Please contact our office at {{ 'Global' |
 
                     LinkButton lbLogin = new LinkButton();
                     phExternalLogins.Controls.Add( lbLogin );
-                    lbLogin.AddCssClass( "btn btn-authenication " + loginTypeName.ToLower() );
+                    lbLogin.AddCssClass( "btn btn-authentication " + loginTypeName.ToLower() );
                     lbLogin.ID = "lb" + loginTypeName + "Login";
                     lbLogin.Click += lbLogin_Click;
                     lbLogin.CausesValidation = false;
@@ -190,12 +190,12 @@ Sorry, your account has been locked.  Please contact our office at {{ 'Global' |
                                 LoginUser( tbUserName.Text, returnUrl, cbRememberMe.Checked );
                             }
                             else
-                            { 
-                                var globalMergeFields = Rock.Web.Cache.GlobalAttributesCache.GetMergeFields(null);
+                            {
+                                var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( this.RockPage, this.CurrentPerson );
 
                                 if ( userLogin.IsLockedOut ?? false )
                                 {
-                                    lLockedOutCaption.Text = GetAttributeValue( "LockedOutCaption" ).ResolveMergeFields( globalMergeFields );
+                                    lLockedOutCaption.Text = GetAttributeValue( "LockedOutCaption" ).ResolveMergeFields( mergeFields );
 
                                     pnlLogin.Visible = false;
                                     pnlLockedOut.Visible = true;
@@ -204,7 +204,7 @@ Sorry, your account has been locked.  Please contact our office at {{ 'Global' |
                                 {
                                     SendConfirmation( userLogin );
 
-                                    lConfirmCaption.Text = GetAttributeValue( "ConfirmCaption" ).ResolveMergeFields( globalMergeFields );
+                                    lConfirmCaption.Text = GetAttributeValue( "ConfirmCaption" ).ResolveMergeFields( mergeFields );
 
                                     pnlLogin.Visible = false;
                                     pnlConfirmation.Visible = true;
@@ -379,15 +379,15 @@ Sorry, your account has been locked.  Please contact our office at {{ 'Global' |
                 url = ResolveRockUrl( "~/ConfirmAccount" );
             }
 
-            var mergeObjects = GlobalAttributesCache.GetMergeFields( CurrentPerson );
-            mergeObjects.Add( "ConfirmAccountUrl", RootPath + url.TrimStart( new char[] { '/' } ) );
+            var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( this.RockPage, this.CurrentPerson );
+            mergeFields.Add( "ConfirmAccountUrl", RootPath + url.TrimStart( new char[] { '/' } ) );
 
             var personDictionary = userLogin.Person.ToLiquid() as Dictionary<string, object>;
-            mergeObjects.Add( "Person", personDictionary );
-            mergeObjects.Add( "User", userLogin );
+            mergeFields.Add( "Person", personDictionary );
+            mergeFields.Add( "User", userLogin );
 
             var recipients = new List<RecipientData>();
-            recipients.Add( new RecipientData( userLogin.Person.Email, mergeObjects ) );
+            recipients.Add( new RecipientData( userLogin.Person.Email, mergeFields ) );
 
             Email.Send( GetAttributeValue( "ConfirmAccountTemplate" ).AsGuid(), recipients, ResolveRockUrl( "~/" ), ResolveRockUrl( "~~/" ), false );
         }

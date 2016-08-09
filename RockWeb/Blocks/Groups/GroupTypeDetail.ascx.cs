@@ -1,11 +1,11 @@
 ﻿// <copyright>
 // Copyright by the Spark Development Network
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Rock Community License (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+// http://www.rockrms.com/license
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -428,8 +428,13 @@ namespace RockWeb.Blocks.Groups
             groupType.ShowConnectionStatus = cbShowConnectionStatus.Checked;
             groupType.IconCssClass = tbIconCssClass.Text;
             groupType.TakesAttendance = cbTakesAttendance.Checked;
+            groupType.GroupsRequireCampus = cbGroupsRequireCampus.Checked;
+            groupType.GroupAttendanceRequiresLocation = cbGroupAttendanceRequiresLocation.Checked;
+            groupType.GroupAttendanceRequiresSchedule = cbGroupAttendanceRequiresSchedule.Checked;
+            groupType.AttendanceCountsAsWeekendService = cbWeekendService.Checked;
             groupType.SendAttendanceReminder = cbSendAttendanceReminder.Checked;
             groupType.AttendanceRule = ddlAttendanceRule.SelectedValueAsEnum<AttendanceRule>();
+            groupType.GroupCapacityRule = ddlGroupCapacityRule.SelectedValueAsEnum<GroupCapacityRule>();
             groupType.AttendancePrintTo = ddlPrintTo.SelectedValueAsEnum<PrintTo>();
             groupType.AllowedScheduleTypes = allowedScheduleTypes;
             groupType.LocationSelectionMode = locationSelectionMode;
@@ -685,9 +690,13 @@ namespace RockWeb.Blocks.Groups
             ddlGroupTypePurpose.Enabled = !groupType.IsSystem;
             ddlGroupTypePurpose.SetValue( groupType.GroupTypePurposeValueId );
 
+            ddlGroupCapacityRule.SetValue( (int)groupType.GroupCapacityRule );
+
             ChildGroupTypesList = new List<int>();
             groupType.ChildGroupTypes.ToList().ForEach( a => ChildGroupTypesList.Add( a.Id ) );
             BindChildGroupTypesGrid();
+
+            cbGroupsRequireCampus.Checked = groupType.GroupsRequireCampus;
 
             // Display
             cbShowInGroupList.Checked = groupType.ShowInGroupList;
@@ -727,9 +736,12 @@ namespace RockWeb.Blocks.Groups
 
             // Check In
             cbTakesAttendance.Checked = groupType.TakesAttendance;
+            cbWeekendService.Checked = groupType.AttendanceCountsAsWeekendService;
             cbSendAttendanceReminder.Checked = groupType.SendAttendanceReminder;
             ddlAttendanceRule.SetValue( (int)groupType.AttendanceRule );
             ddlPrintTo.SetValue( (int)groupType.AttendancePrintTo );
+            cbGroupAttendanceRequiresSchedule.Checked = groupType.GroupAttendanceRequiresSchedule;
+            cbGroupAttendanceRequiresLocation.Checked = groupType.GroupAttendanceRequiresLocation;
 
             // Attributes
             gtpInheritedGroupType.Enabled = !groupType.IsSystem;
@@ -832,6 +844,8 @@ namespace RockWeb.Blocks.Groups
         private void LoadDropDowns( int? groupTypeId )
         {
             ddlAttendanceRule.BindToEnum<Rock.Model.AttendanceRule>();
+
+            ddlGroupCapacityRule.BindToEnum<GroupCapacityRule>();
 
             cblScheduleTypes.Items.Clear();
             cblScheduleTypes.Items.Add( new ListItem( "Weekly", "1" ) );

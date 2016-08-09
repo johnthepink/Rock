@@ -1,11 +1,11 @@
 ﻿// <copyright>
 // Copyright by the Spark Development Network
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Rock Community License (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+// http://www.rockrms.com/license
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -632,15 +632,15 @@ namespace RockWeb.Blocks.Groups
                     group.Members = group.Members.OrderBy( m => m.Person.LastName ).ThenBy( m => m.Person.FirstName ).ToList();
                 }
 
-                var mergeFields = new Dictionary<string, object>();
+                var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( this.RockPage, this.CurrentPerson );
                 mergeFields.Add( "Group", group );
 
                 // add linked pages
                 Dictionary<string, object> linkedPages = new Dictionary<string, object>();
-                linkedPages.Add( "PersonDetailPage", LinkedPageUrl( "PersonDetailPage", null ) );
-                linkedPages.Add( "RosterPage", LinkedPageUrl( "RosterPage", null ) );
-                linkedPages.Add( "AttendancePage", LinkedPageUrl( "AttendancePage", null ) );
-                linkedPages.Add( "CommunicationPage", LinkedPageUrl( "CommunicationPage", null ) );
+                linkedPages.Add( "PersonDetailPage", LinkedPageRoute( "PersonDetailPage" ) );
+                linkedPages.Add( "RosterPage", LinkedPageRoute( "RosterPage" ) );
+                linkedPages.Add( "AttendancePage", LinkedPageRoute( "AttendancePage" ) );
+                linkedPages.Add( "CommunicationPage", LinkedPageRoute( "CommunicationPage" ) );
                 mergeFields.Add( "LinkedPages", linkedPages );
 
                 // add collection of allowed security actions
@@ -649,11 +649,6 @@ namespace RockWeb.Blocks.Groups
                 securityActions.Add( "Edit", group != null && group.IsAuthorized( Authorization.EDIT, CurrentPerson ) );
                 securityActions.Add( "Administrate", group != null && group.IsAuthorized( Authorization.ADMINISTRATE, CurrentPerson ) );
                 mergeFields.Add( "AllowedActions", securityActions );
-
-                mergeFields.Add( "CurrentPerson", CurrentPerson );
-
-                var globalAttributeFields = Rock.Web.Cache.GlobalAttributesCache.GetMergeFields( CurrentPerson );
-                globalAttributeFields.ToList().ForEach( d => mergeFields.Add( d.Key, d.Value ) );
 
                 Dictionary<string, object> currentPageProperties = new Dictionary<string, object>();
                 currentPageProperties.Add( "Id", RockPage.PageId );

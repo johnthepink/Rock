@@ -1,11 +1,11 @@
 ﻿// <copyright>
 // Copyright by the Spark Development Network
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Rock Community License (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+// http://www.rockrms.com/license
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -142,7 +142,7 @@ namespace Rock.Communication.Transport
                 {
                     var currentPerson = communication.CreatedByPersonAlias.Person;
                     var globalAttributes = Rock.Web.Cache.GlobalAttributesCache.Read();
-                    var globalConfigValues = Rock.Web.Cache.GlobalAttributesCache.GetMergeFields( currentPerson );
+                    var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null, currentPerson );
 
                     // From - if none is set, use the one in the Organization's GlobalAttributes.
                     string fromAddress = communication.GetMediumDataValue( "FromAddress" );
@@ -158,8 +158,8 @@ namespace Rock.Communication.Transport
                     }
 
                     // Resolve any possible merge fields in the from address
-                    fromAddress = fromAddress.ResolveMergeFields( globalConfigValues, currentPerson );
-                    fromName = fromName.ResolveMergeFields( globalConfigValues, currentPerson );
+                    fromAddress = fromAddress.ResolveMergeFields( mergeFields, currentPerson, communication.EnabledLavaCommands );
+                    fromName = fromName.ResolveMergeFields( mergeFields, currentPerson, communication.EnabledLavaCommands );
 
                     MailMessage message = new MailMessage();
                     message.From = new MailAddress( fromAddress, fromName );
@@ -247,10 +247,10 @@ namespace Rock.Communication.Transport
                                         message.To.Add( new MailAddress( recipient.PersonAlias.Person.Email, recipient.PersonAlias.Person.FullName ) );
 
                                         // Create merge field dictionary
-                                        var mergeObjects = recipient.CommunicationMergeValues( globalConfigValues );
+                                        var mergeObjects = recipient.CommunicationMergeValues( mergeFields );
 
                                         // Subject
-                                        message.Subject = communication.Subject.ResolveMergeFields( mergeObjects, currentPerson );
+                                        message.Subject = communication.Subject.ResolveMergeFields( mergeObjects, currentPerson, communication.EnabledLavaCommands );
 
                                         // convert any special microsoft word characters to normal chars so they don't look funny (for example "Hey â€œdouble-quotesâ€ from â€˜single quoteâ€™")
                                         message.Subject = message.Subject.ReplaceWordChars();
@@ -377,9 +377,9 @@ namespace Rock.Communication.Transport
             if ( !string.IsNullOrWhiteSpace( from ) )
             {
                 // Resolve any possible merge fields in the from address
-                var globalConfigValues = Rock.Web.Cache.GlobalAttributesCache.GetMergeFields( null );
-                from = from.ResolveMergeFields( globalConfigValues );
-                fromName = fromName.ResolveMergeFields( globalConfigValues );
+                var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null );
+                from = from.ResolveMergeFields( mergeFields );
+                fromName = fromName.ResolveMergeFields( mergeFields );
 
                 MailMessage message = new MailMessage();
                 if ( string.IsNullOrWhiteSpace( fromName ) )
@@ -416,7 +416,7 @@ namespace Rock.Communication.Transport
                 {
                     foreach ( var recipientData in recipients )
                     {
-                        foreach ( var g in globalConfigValues )
+                        foreach ( var g in mergeFields )
                         {
                             if ( recipientData.MergeFields.ContainsKey( g.Key ) )
                             {
@@ -438,6 +438,8 @@ namespace Rock.Communication.Transport
                             message.To.Clear();
                             message.To.Add( to );
 
+                            message.Headers.Clear();
+
                             string subject = template.Subject.ResolveMergeFields( recipientData.MergeFields );
                             string body = Regex.Replace( template.Body.ResolveMergeFields( recipientData.MergeFields ), @"\[\[\s*UnsubscribeOption\s*\]\]", string.Empty );
 
@@ -452,7 +454,9 @@ namespace Rock.Communication.Transport
                                 subject = subject.Replace( "~/", appRoot );
                                 body = body.Replace( "~/", appRoot );
                                 body = body.Replace( @" src=""/", @" src=""" + appRoot );
+                                body = body.Replace( @" src='/", @" src='" + appRoot );
                                 body = body.Replace( @" href=""/", @" href=""" + appRoot );
+                                body = body.Replace( @" href='/", @" href='" + appRoot );
                             }
 
                             message.Subject = subject;
@@ -527,9 +531,9 @@ namespace Rock.Communication.Transport
                 if ( !string.IsNullOrWhiteSpace( from ) )
                 {
                     // Resolve any possible merge fields in the from address
-                    var globalConfigValues = Rock.Web.Cache.GlobalAttributesCache.GetMergeFields( null );
-                    from = from.ResolveMergeFields( globalConfigValues );
-                    fromName = fromName.ResolveMergeFields( globalConfigValues );
+                    var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null );
+                    from = from.ResolveMergeFields( mergeFields );
+                    fromName = fromName.ResolveMergeFields( mergeFields );
 
                     string subject = string.Empty;
                     mediumData.TryGetValue( "Subject", out subject );
@@ -678,8 +682,8 @@ namespace Rock.Communication.Transport
                 if ( !string.IsNullOrWhiteSpace( from ) )
                 {
                     // Resolve any possible merge fields in the from address
-                    var globalConfigValues = Rock.Web.Cache.GlobalAttributesCache.GetMergeFields( null );
-                    string msgFrom = from.ResolveMergeFields( globalConfigValues );
+                    var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( null );
+                    string msgFrom = from.ResolveMergeFields( mergeFields );
 
                     string msgSubject = subject;
                     string msgBody = body;

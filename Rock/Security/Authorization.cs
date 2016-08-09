@@ -1,11 +1,11 @@
 ﻿// <copyright>
 // Copyright by the Spark Development Network
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Rock Community License (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+// http://www.rockrms.com/license
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -372,7 +372,7 @@ namespace Rock.Security
         /// <returns></returns>
         public static bool Authorized( ISecured entity, string action, SpecialRole specialRole )
         {
-            return ItemAuthorized( entity, action, specialRole ) ?? entity.IsAllowedByDefault( action );
+            return ItemAuthorized( entity, action, specialRole, true, true ) ?? entity.IsAllowedByDefault( action );
         }
 
         /// <summary>
@@ -385,7 +385,7 @@ namespace Rock.Security
         /// <returns></returns>
         public static bool Authorized( ISecured entity, string action, Rock.Model.Person person )
         {
-            return ItemAuthorized( entity, action, person ) ?? entity.IsAllowedByDefault( action );
+            return ItemAuthorized( entity, action, person, true, true ) ?? entity.IsAllowedByDefault( action );
         }
 
         /// <summary>
@@ -753,8 +753,10 @@ namespace Rock.Security
         /// <param name="entity">The entity.</param>
         /// <param name="action">The action.</param>
         /// <param name="specialRole">The special role.</param>
+        /// <param name="isRootEntity">if set to <c>true</c> [is root entity].</param>
+        /// <param name="checkParentAuthority">if set to <c>true</c> [check parent authority].</param>
         /// <returns></returns>
-        private static bool? ItemAuthorized( ISecured entity, string action, SpecialRole specialRole )
+        private static bool? ItemAuthorized( ISecured entity, string action, SpecialRole specialRole, bool isRootEntity, bool checkParentAuthority )
         {
             Load();
 
@@ -795,14 +797,17 @@ namespace Rock.Security
             // parent authority return the defualt authorization
             bool? parentAuthorized = null;
 
-            if ( entity.ParentAuthorityPre != null )
+            if ( checkParentAuthority )
             {
-                parentAuthorized = ItemAuthorized( entity.ParentAuthorityPre, action, specialRole );
-            }
+                if ( isRootEntity && entity.ParentAuthorityPre != null )
+                {
+                    parentAuthorized = ItemAuthorized( entity.ParentAuthorityPre, action, specialRole, false, false );
+                }
 
-            if ( !parentAuthorized.HasValue && entity.ParentAuthority != null )
-            {
-                parentAuthorized = ItemAuthorized( entity.ParentAuthority, action, specialRole );
+                if ( !parentAuthorized.HasValue && entity.ParentAuthority != null )
+                {
+                    parentAuthorized = ItemAuthorized( entity.ParentAuthority, action, specialRole, false, true );
+                }
             }
 
             return parentAuthorized;
@@ -814,8 +819,10 @@ namespace Rock.Security
         /// <param name="entity">The entity.</param>
         /// <param name="action">The action.</param>
         /// <param name="person">The person.</param>
+        /// <param name="isRootEntity">if set to <c>true</c> [is root entity].</param>
+        /// <param name="checkParentAuthority">if set to <c>true</c> [check parent].</param>
         /// <returns></returns>
-        private static bool? ItemAuthorized( ISecured entity, string action, Rock.Model.Person person )
+        private static bool? ItemAuthorized( ISecured entity, string action, Rock.Model.Person person, bool isRootEntity, bool checkParentAuthority )
         {
             Load();
 
@@ -922,14 +929,17 @@ namespace Rock.Security
             // parent authority return the defualt authorization
             bool? parentAuthorized = null;
 
-            if ( entity.ParentAuthorityPre != null )
+            if ( checkParentAuthority )
             {
-                parentAuthorized = entity.ParentAuthorityPre.IsAuthorized( action, person );
-            }
+                if ( isRootEntity && entity.ParentAuthorityPre != null )
+                {
+                    parentAuthorized = ItemAuthorized( entity.ParentAuthorityPre, action, person, false, false );
+                }
 
-            if ( !parentAuthorized.HasValue && entity.ParentAuthority != null )
-            {
-                parentAuthorized = entity.ParentAuthority.IsAuthorized( action, person );
+                if ( !parentAuthorized.HasValue && entity.ParentAuthority != null )
+                {
+                    parentAuthorized = ItemAuthorized( entity.ParentAuthority, action, person, false, true );
+                }
             }
 
             return parentAuthorized;

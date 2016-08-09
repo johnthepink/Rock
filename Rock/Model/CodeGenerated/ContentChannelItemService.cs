@@ -5,13 +5,13 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 // <copyright>
-// Copyright 2013 by the Spark Development Network
+// Copyright by the Spark Development Network
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Rock Community License (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+// http://www.rockrms.com/license
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -51,6 +51,18 @@ namespace Rock.Model
         public bool CanDelete( ContentChannelItem item, out string errorMessage )
         {
             errorMessage = string.Empty;
+ 
+            if ( new Service<ContentChannelItemAssociation>( Context ).Queryable().Any( a => a.ChildContentChannelItemId == item.Id ) )
+            {
+                errorMessage = string.Format( "This {0} is assigned to a {1}.", ContentChannelItem.FriendlyTypeName, ContentChannelItemAssociation.FriendlyTypeName );
+                return false;
+            }  
+ 
+            if ( new Service<ContentChannelItemAssociation>( Context ).Queryable().Any( a => a.ContentChannelItemId == item.Id ) )
+            {
+                errorMessage = string.Format( "This {0} is assigned to a {1}.", ContentChannelItem.FriendlyTypeName, ContentChannelItemAssociation.FriendlyTypeName );
+                return false;
+            }  
             return true;
         }
     }
@@ -96,6 +108,7 @@ namespace Rock.Model
             target.ExpireDateTime = source.ExpireDateTime;
             target.ForeignGuid = source.ForeignGuid;
             target.ForeignKey = source.ForeignKey;
+            target.Order = source.Order;
             target.Permalink = source.Permalink;
             target.Priority = source.Priority;
             target.StartDateTime = source.StartDateTime;

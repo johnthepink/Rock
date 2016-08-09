@@ -1,11 +1,11 @@
 ﻿// <copyright>
 // Copyright by the Spark Development Network
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Rock Community License (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+// http://www.rockrms.com/license
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -34,7 +34,7 @@ namespace Rock.Model
     /// </summary>
     [Table( "ContentChannelItem")]
     [DataContract]
-    public partial class ContentChannelItem : Model<ContentChannelItem>, IRockIndexable
+    public partial class ContentChannelItem : Model<ContentChannelItem>, IOrdered, IRockIndexable
     {
 
         #region Entity Properties
@@ -144,6 +144,15 @@ namespace Rock.Model
         [DataMember]
         public string Permalink { get; set; }
 
+        /// <summary>
+        /// Gets or sets the order.
+        /// </summary>
+        /// <value>
+        /// The order.
+        /// </value>
+        [DataMember]
+        public int Order { get; set; }
+
         #endregion
 
         #region Virtual Properties
@@ -173,6 +182,34 @@ namespace Rock.Model
         /// The approved by person alias.
         /// </value>
         public virtual PersonAlias ApprovedByPersonAlias { get; set; }
+
+        /// <summary>
+        /// Gets or sets the child items.
+        /// </summary>
+        /// <value>
+        /// The child items.
+        /// </value>
+        [LavaInclude]
+        public virtual ICollection<ContentChannelItemAssociation> ChildItems
+        {
+            get { return _childItems ?? ( _childItems = new Collection<ContentChannelItemAssociation>() ); }
+            set { _childItems = value; }
+        }
+        private ICollection<ContentChannelItemAssociation> _childItems;
+
+        /// <summary>
+        /// Gets or sets the parent items.
+        /// </summary>
+        /// <value>
+        /// The parent items.
+        /// </value>
+        [LavaInclude]
+        public virtual ICollection<ContentChannelItemAssociation> ParentItems
+        {
+            get { return _parentItems ?? ( _parentItems = new Collection<ContentChannelItemAssociation>() ); }
+            set { _parentItems = value; }
+        }
+        private ICollection<ContentChannelItemAssociation> _parentItems;
 
         /// <summary>
         /// Gets or sets the content channel items.
@@ -219,8 +256,6 @@ namespace Rock.Model
         }
 
         #endregion
-
-        #region Methods
 
         #region Index Methods
         public void BulkIndexDocuments()
@@ -270,6 +305,21 @@ namespace Rock.Model
             return typeof( ContentChannelItemIndex );
         }
         #endregion
+
+        #region Methods
+        /// <summary>
+        /// Pres the save.
+        /// </summary>
+        /// <param name="dbContext">The database context.</param>
+        /// <param name="state">The state.</param>
+        public override void PreSaveChanges( DbContext dbContext, System.Data.Entity.EntityState state )
+        {
+            if ( state == System.Data.Entity.EntityState.Deleted )
+            {
+                ChildItems.Clear();
+                ParentItems.Clear();
+            }
+        }
         #endregion
     }
 

@@ -1,11 +1,11 @@
 ﻿// <copyright>
 // Copyright by the Spark Development Network
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Rock Community License (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+// http://www.rockrms.com/license
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -60,7 +60,9 @@ namespace Rock
             if ( !( lavaObject is IDictionary<string, object> ) || !( (IDictionary<string, object>)lavaObject ).Keys.Contains( "GlobalAttribute" ) )
             {
                 var globalAttributes = new Dictionary<string, object>();
-                globalAttributes.Add( "GlobalAttribute", Rock.Web.Cache.GlobalAttributesCache.GetMergeFields( null ) );
+
+                // Lava Help Text does special stuff for GlobalAttribute, but it still needs the list of possible Global Attribute MergeFields to generate the help text
+                globalAttributes.Add( "GlobalAttribute", GlobalAttributesCache.GetLegacyMergeFields( null ) );
                 lavaDebugPanel.Append( formatLavaDebugInfo( globalAttributes.LiquidizeChildren( 0, rockContext ) ) );
             }
 
@@ -451,6 +453,20 @@ namespace Rock
         /// <returns></returns>
         public static string ResolveMergeFields( this string content, IDictionary<string, object> mergeObjects, Person currentPersonOverride )
         {
+            var enabledCommands = GlobalAttributesCache.Read().GetValue( "DefaultEnabledLavaCommands" );
+            return content.ResolveMergeFields( mergeObjects, currentPersonOverride, enabledCommands );
+        }
+
+        /// <summary>
+        /// Resolves the merge fields.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="mergeObjects">The merge objects.</param>
+        /// <param name="currentPersonOverride">The current person override.</param>
+        /// <param name="enabledLavaCommands">The enabled lava commands.</param>
+        /// <returns></returns>
+        public static string ResolveMergeFields( this string content, IDictionary<string, object> mergeObjects, Person currentPersonOverride, string enabledLavaCommands )
+        {
             try
             {
                 if ( !content.HasMergeFields() )
@@ -459,6 +475,7 @@ namespace Rock
                 }
 
                 Template template = Template.Parse( content );
+                template.InstanceAssigns.Add( "EnabledCommands", enabledLavaCommands );
                 template.InstanceAssigns.Add( "CurrentPerson", currentPersonOverride );
                 return template.Render( Hash.FromDictionary( mergeObjects ) );
             }
@@ -498,6 +515,21 @@ namespace Rock
         /// <returns></returns>
         public static string ResolveMergeFields( this string content, IDictionary<string, object> mergeObjects, bool encodeStrings = false, bool throwExceptionOnErrors = false )
         {
+            var enabledCommands = GlobalAttributesCache.Read().GetValue( "DefaultEnabledLavaCommands" );
+            return content.ResolveMergeFields( mergeObjects, enabledCommands, encodeStrings, throwExceptionOnErrors );
+        }
+
+        /// <summary>
+        /// Resolves the merge fields.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="mergeObjects">The merge objects.</param>
+        /// <param name="enabledLavaCommands">The enabled lava commands.</param>
+        /// <param name="encodeStrings">if set to <c>true</c> [encode strings].</param>
+        /// <param name="throwExceptionOnErrors">if set to <c>true</c> [throw exception on errors].</param>
+        /// <returns></returns>
+        public static string ResolveMergeFields( this string content, IDictionary<string, object> mergeObjects, string enabledLavaCommands, bool encodeStrings = false, bool throwExceptionOnErrors = false )
+        {
             try
             {
                 if ( !content.HasMergeFields() )
@@ -505,8 +537,17 @@ namespace Rock
                     return content ?? string.Empty;
                 }
 
+                if ( GlobalAttributesCache.Read().LavaSupportLevel == Lava.LavaSupportLevel.LegacyWithWarning && mergeObjects.ContainsKey( "GlobalAttribute" ) )
+                {
+                    if ( hasLegacyGlobalAttributeLavaMergeFields.IsMatch( content ) )
+                    {
+                        Rock.Model.ExceptionLogService.LogException( new Rock.Lava.LegacyLavaSyntaxDetectedException( "GlobalAttribute", "" ), System.Web.HttpContext.Current );
+                    }
+                }
+
                 Template template = Template.Parse( content );
-                
+                template.InstanceAssigns.Add( "EnabledCommands", enabledLavaCommands );
+
                 if ( encodeStrings )
                 {
                     // if encodeStrings = true, we want any string values to be XML Encoded ( 
@@ -550,6 +591,11 @@ namespace Rock
         /// Compiled RegEx for detecting if a string has Lava merge fields
         /// </summary>
         private static Regex hasLavaMergeFields = new Regex( @".*\{.+\}.*", RegexOptions.Compiled );
+
+        /// <summary>
+        /// Compiled RegEx for detecting if a string uses the Legacy "GlobalAttribute." syntax
+        /// </summary>
+        private static Regex hasLegacyGlobalAttributeLavaMergeFields = new Regex( @".*\{.+GlobalAttribute.+\}.*", RegexOptions.Compiled );
 
         /// <summary>
         /// Determines whether the string potentially has merge fields in it.

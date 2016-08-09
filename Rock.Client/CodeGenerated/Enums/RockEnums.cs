@@ -5,13 +5,13 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 // <copyright>
-// Copyright 2013 by the Spark Development Network
+// Copyright by the Spark Development Network
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Rock Community License (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+// http://www.rockrms.com/license
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -224,12 +224,11 @@ namespace Rock.Client.Enums
 
     /// <summary>
     /// </summary>
-    public enum GiversViewBy
+    public enum GroupCapacityRule
     {
-        Giver = 0x0,
-        Adults = 0x1,
-        Children = 0x2,
-        Family = 0x3,
+        None = 0x0,
+        Hard = 0x1,
+        Soft = 0x2,
     }
 
     /// <summary>
@@ -295,6 +294,15 @@ namespace Rock.Client.Enums
         Global = 0x0,
         Personal = 0x1,
         PersonalAndGlobal = 0x2,
+    }
+
+    /// <summary>
+    /// </summary>
+    public enum MetricNumericDataType
+    {
+        Integer = 0x0,
+        Decimal = 0x1,
+        Currency = 0x2,
     }
 
     /// <summary>
@@ -394,6 +402,7 @@ namespace Rock.Client.Enums
         MobilePhone = 0x8,
         HomePhone = 0x9,
         WorkPhone = 0xa,
+        Grade = 0xb,
     }
 
     /// <summary>
@@ -443,6 +452,24 @@ namespace Rock.Client.Enums
         Weekly = 0x1,
         Custom = 0x2,
         Named = 0x4,
+    }
+
+    /// <summary>
+    /// </summary>
+    public enum SignatureDocumentAction
+    {
+        Email = 0x0,
+        Embed = 0x1,
+    }
+
+    /// <summary>
+    /// </summary>
+    public enum SignatureDocumentStatus
+    {
+        None = 0x0,
+        Sent = 0x1,
+        Signed = 0x2,
+        Cancelled = 0x3,
     }
 
     /// <summary>

@@ -1,11 +1,11 @@
 ﻿// <copyright>
 // Copyright by the Spark Development Network
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Rock Community License (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+// http://www.rockrms.com/license
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -400,7 +400,7 @@ $(document).ready(function() {
             pageRef.Parameters.AddOrReplace( "Page", "PageNum" );
 
             Dictionary<string, object> linkedPages = new Dictionary<string, object>();
-            linkedPages.Add( "DetailPage", LinkedPageUrl( "DetailPage", null ) );
+            linkedPages.Add( "DetailPage", LinkedPageRoute( "DetailPage" ) );
 
             var errorMessages = new List<string>();
             List<ContentChannelItem> content;
@@ -436,7 +436,7 @@ $(document).ready(function() {
             pagination.UrlTemplate = pageRef.BuildUrl();
             var currentPageContent = pagination.GetCurrentPageItems( content );
 
-            var globalAttributeFields = Rock.Web.Cache.GlobalAttributesCache.GetMergeFields( CurrentPerson );
+            var commonMergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( this.RockPage, this.CurrentPerson );
 
             // Merge content and attribute fields if block is configured to do so.
             if ( GetAttributeValue( "MergeContent" ).AsBoolean() )
@@ -446,9 +446,9 @@ $(document).ready(function() {
                 {
                     // TODO: When support for "Person" is not supported anymore (should use "CurrentPerson" instead), remove this line
                     itemMergeFields.Add( "Person", CurrentPerson );
-                    itemMergeFields.Add( "CurrentPerson", CurrentPerson );
                 }
-                globalAttributeFields.ToList().ForEach( d => itemMergeFields.Add( d.Key, d.Value ) );
+
+                commonMergeFields.ToList().ForEach( d => itemMergeFields.Add( d.Key, d.Value ) );
 
                 foreach ( var item in currentPageContent )
                 {
@@ -461,26 +461,10 @@ $(document).ready(function() {
                 }
             }
 
-            // add context to merge fields
-            var contextEntityTypes = RockPage.GetContextEntityTypes();
-
-            var contextObjects = new Dictionary<string, object>();
-            foreach ( var conextEntityType in contextEntityTypes )
-            {
-                var contextObject = RockPage.GetCurrentContext( conextEntityType );
-                contextObjects.Add( conextEntityType.FriendlyName, contextObject );
-            }
-            
-
-            var mergeFields = new  Dictionary<string, object>();
+            var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( this.RockPage, this.CurrentPerson );
             mergeFields.Add( "Pagination", pagination );
             mergeFields.Add( "LinkedPages", linkedPages );
             mergeFields.Add( "Items", currentPageContent );
-            mergeFields.Add( "Campuses", CampusCache.All() );
-            mergeFields.Add( "CurrentPerson", CurrentPerson );
-            mergeFields.Add( "Context", contextObjects );
-
-            globalAttributeFields.ToList().ForEach( d => mergeFields.Add( d.Key, d.Value ) );
             mergeFields.Add( "RockVersion", Rock.VersionInfo.VersionInfo.GetRockProductVersionNumber() );
 
             // enable showing debug info
@@ -501,11 +485,11 @@ $(document).ready(function() {
             }
 
             // TODO: When support for "Person" is not supported anymore (should use "CurrentPerson" instead), remove this line
-            mergeFields.Add( "Person", CurrentPerson );
+            mergeFields.AddOrIgnore( "Person", CurrentPerson );
 
             // set page title
             if ( GetAttributeValue( "SetPageTitle" ).AsBoolean() && content.Count > 0 )
-            {               
+            {
                 if ( string.IsNullOrWhiteSpace( PageParameter( "Item" ) ) )
                 {
                     // set title to channel name
@@ -520,6 +504,12 @@ $(document).ready(function() {
                     RockPage.PageTitle = itemTitle;
                     RockPage.BrowserTitle = String.Format( "{0} | {1}", itemTitle, RockPage.Site.Name );
                     RockPage.Header.Title = String.Format( "{0} | {1}", itemTitle, RockPage.Site.Name );
+                }
+
+                var pageBreadCrumb = RockPage.PageReference.BreadCrumbs.FirstOrDefault();
+                if ( pageBreadCrumb != null )
+                {
+                    pageBreadCrumb.Name = RockPage.PageTitle;
                 }
             }
 
@@ -605,17 +595,25 @@ $(document).ready(function() {
 
         private Template GetTemplate()
         {
-            var template = GetCacheItem( TEMPLATE_CACHE_KEY ) as Template;
-            if ( template == null )
-            {
-                template = Template.Parse( GetAttributeValue( "Template" ) );
+            Template template = null;
 
-                int? cacheDuration = GetAttributeValue( "CacheDuration" ).AsInteger();
-                if ( cacheDuration > 0 )
+            try {
+                template = GetCacheItem( TEMPLATE_CACHE_KEY ) as Template;
+                if ( template == null )
                 {
-                    var cacheItemPolicy = new CacheItemPolicy { AbsoluteExpiration = DateTimeOffset.Now.AddSeconds( cacheDuration.Value ) };
-                    AddCacheItem( TEMPLATE_CACHE_KEY, template, cacheItemPolicy );
+                    template = Template.Parse( GetAttributeValue( "Template" ) );
+
+                    int? cacheDuration = GetAttributeValue( "CacheDuration" ).AsInteger();
+                    if ( cacheDuration > 0 )
+                    {
+                        var cacheItemPolicy = new CacheItemPolicy { AbsoluteExpiration = DateTimeOffset.Now.AddSeconds( cacheDuration.Value ) };
+                        AddCacheItem( TEMPLATE_CACHE_KEY, template, cacheItemPolicy );
+                    }
                 }
+            }
+            catch(Exception ex )
+            {
+                template = Template.Parse( string.Format("Lava error: {0}", ex.Message ) );
             }
 
             return template;
@@ -889,6 +887,8 @@ $(document).ready(function() {
                     kvlOrder.CustomKeys.Add( "Status", "Status" );
                     kvlOrder.CustomKeys.Add( "StartDateTime", "Start" );
                     kvlOrder.CustomKeys.Add( "ExpireDateTime", "Expire" );
+                    kvlOrder.CustomKeys.Add( "Order", "Order" );
+
 
                     // add attributes to the meta description and meta image attribute list
                     ddlMetaDescriptionAttribute.Items.Clear();

@@ -1,11 +1,11 @@
 ﻿// <copyright>
 // Copyright by the Spark Development Network
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Rock Community License (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+// http://www.rockrms.com/license
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -322,17 +322,19 @@ namespace Rock.Model
 
             fullName = fullName.Trim();
 
+            var nameParts = fullName.Trim().Split( new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries ).ToList();
+
             if ( fullName.Contains( ',' ) )
             {
                 reversed = true;
 
                 // only split by comma if there is a comma present (for example if 'Smith Jones, Sally' is the search, last name would be 'Smith Jones')
-                var nameParts = fullName.Split( ',' );
-                if ( nameParts.Length >= 1 )
+                nameParts = fullName.Split( ',' ).ToList();
+                if ( nameParts.Count >= 1 )
                 {
                     lastNames.Add( nameParts[0].Trim() );
                 }
-                if ( nameParts.Length >= 2 )
+                if ( nameParts.Count >= 2 )
                 {
                     firstNames.Add( nameParts[1].Trim() );
                 }
@@ -341,7 +343,6 @@ namespace Rock.Model
             {
                 reversed = false;
 
-                var nameParts = fullName.Trim().Split( new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries ).ToList();
                 for ( int i = 1; i < nameParts.Count; i++ )
                 {
                     firstNames.Add( nameParts.Take( i ).ToList().AsDelimited( " " ) );
@@ -398,6 +399,14 @@ namespace Rock.Model
                     qry = qry.Union( GetByFirstLastName( firstNames[i], lastNames[i], includeDeceased, includeBusinesses ) );
                 }
 
+                // always include a search for just last name using the last two parts of name search
+                if ( nameParts.Count >= 2 )
+                {
+                    var lastName = string.Join( " ", nameParts.TakeLast( 2 ) );
+
+                    qry = qry.Union( GetByLastName( lastName, includeDeceased, includeBusinesses ) );
+                }
+
                 return qry;
             }
         }
@@ -443,6 +452,23 @@ namespace Rock.Model
         /// <summary>
         /// Gets the by full name ordered.
         /// </summary>
+        /// <param name="lastName">The last name.</param>
+        /// <param name="includeDeceased">if set to <c>true</c> [include deceased].</param>
+        /// <param name="includeBusinesses">if set to <c>true</c> [include businesses].</param>
+        /// <returns></returns>
+        public IQueryable<Person> GetByLastName( string lastName, bool includeDeceased, bool includeBusinesses )
+        {
+            lastName = lastName.Trim();
+
+            var lastNameQry = Queryable( includeDeceased, includeBusinesses )
+                                    .Where(p => p.LastName.StartsWith( lastName ));
+
+            return lastNameQry;
+        }
+
+        /// <summary>
+        /// Gets the by full name ordered.
+        /// </summary>
         /// <param name="fullName">The full name.</param>
         /// <param name="includeDeceased">if set to <c>true</c> [include deceased].</param>
         /// <param name="includeBusinesses">if set to <c>true</c> [include businesses].</param>
@@ -463,14 +489,14 @@ namespace Rock.Model
         }
 
         /// <summary>
-        /// Gets the similiar sounding names.
+        /// Gets the similar sounding names.
         /// </summary>
         /// <param name="fullName">The full name.</param>
         /// <param name="excludeIds">The exclude ids.</param>
         /// <param name="includeDeceased">if set to <c>true</c> [include deceased].</param>
         /// <param name="includeBusinesses">if set to <c>true</c> [include businesses].</param>
         /// <returns></returns>
-        public List<string> GetSimiliarNames( string fullName, List<int> excludeIds, bool includeDeceased = false, bool includeBusinesses = false )
+        public List<string> GetSimilarNames( string fullName, List<int> excludeIds, bool includeDeceased = false, bool includeBusinesses = false )
         {
             var names = fullName.SplitDelimitedValues();
 
@@ -578,7 +604,7 @@ namespace Rock.Model
         {
             Guid familyGuid = new Guid( Rock.SystemGuid.GroupType.GROUPTYPE_FAMILY );
 
-            return new GroupMemberService( (RockContext)this.Context ).Queryable()
+            return new GroupMemberService( (RockContext)this.Context ).Queryable( true )
                 .Where( m => m.PersonId == personId && m.Group.GroupType.Guid == familyGuid )
                 .Select( m => m.Group )
                 .Distinct();
@@ -764,17 +790,17 @@ namespace Rock.Model
         {
             var groupMemberService = new GroupMemberService( (RockContext)this.Context );
 
-            var familyGroupIds = groupMemberService.Queryable()
+            var familyGroupIds = groupMemberService.Queryable( true )
                 .Where( m =>
                     m.PersonId == personId &&
                     m.Group.GroupTypeId == groupTypeId )
                 .Select( m => m.GroupId )
                 .Distinct();
 
-            return groupMemberService.Queryable( "Person,GroupRole" )
+            return groupMemberService.Queryable( "Person,GroupRole", true )
                 .Where( m =>
                     familyGroupIds.Contains( m.GroupId ) &&
-                    ( includeSelf || m.PersonId != personId ) );
+                    ( includeSelf || ( m.PersonId != personId && !m.Person.IsDeceased ) ) );
         }
 
         /// <summary>
@@ -788,9 +814,10 @@ namespace Rock.Model
         /// </returns>
         public IQueryable<GroupMember> GetFamilyMembers( Group family, int personId, bool includeSelf = false )
         {
-            return new GroupMemberService( (RockContext)this.Context ).Queryable( "GroupRole, Person" )
-                .Where( m => m.GroupId == family.Id )
-                .Where( m => includeSelf || m.PersonId != personId )
+            return new GroupMemberService( (RockContext)this.Context ).Queryable( "GroupRole, Person", true )
+                .Where( m => 
+                    m.GroupId == family.Id &&
+                    ( includeSelf || ( m.PersonId != personId && !m.Person.IsDeceased ) ) )
                 .OrderBy( m => m.GroupRole.Order )
                 .ThenBy( m => m.Person.BirthDate ?? DateTime.MinValue )
                 .ThenByDescending( m => m.Person.Gender )
@@ -1104,8 +1131,10 @@ namespace Rock.Model
         public GroupLocation GetFirstLocation( int personId, int locationTypeValueId )
         {
             Guid familyGuid = new Guid( Rock.SystemGuid.GroupType.GROUPTYPE_FAMILY );
-            return new GroupMemberService( (RockContext)this.Context ).Queryable( "GroupLocations.Location" )
-                .Where( m => m.PersonId == personId && m.Group.GroupType.Guid == familyGuid )
+            return new GroupMemberService( (RockContext)this.Context ).Queryable( "GroupLocations.Location", true )
+                .Where( m => 
+                    m.PersonId == personId && 
+                    m.Group.GroupType.Guid == familyGuid )
                 .SelectMany( m => m.Group.GroupLocations )
                 .Where( gl => gl.GroupLocationTypeValueId == locationTypeValueId )
                 .FirstOrDefault();
@@ -1284,7 +1313,7 @@ namespace Rock.Model
 
             // get the geopoints for the family locations for the selected person
             return groupMemberService
-                .Queryable().AsNoTracking()
+                .Queryable( true ).AsNoTracking()
                 .Where( m =>
                     m.PersonId == personId &&
                     m.Group.GroupType.Guid.Equals( familyTypeGuid ) )
@@ -1544,7 +1573,7 @@ namespace Rock.Model
                 throw new Exception( "Group does not exist, or person is not in the specified group" );
             }
 
-            var memberInOtherFamilies = groupMemberService.Queryable()
+            var memberInOtherFamilies = groupMemberService.Queryable( true )
                 .Where( m =>
                     m.PersonId == personId &&
                     m.Group.GroupTypeId == group.GroupTypeId &&

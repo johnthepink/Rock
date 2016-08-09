@@ -1,11 +1,11 @@
 ﻿// <copyright>
 // Copyright by the Spark Development Network
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Rock Community License (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+// http://www.rockrms.com/license
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,6 +26,7 @@ using Rock;
 using Rock.Attribute;
 using Rock.Data;
 using Rock.Model;
+using Rock.Security;
 using Rock.Web.Cache;
 using Rock.Web.UI;
 using Rock.Web.UI.Controls;
@@ -130,7 +131,7 @@ namespace RockWeb.Blocks.Finance
                         .ToList();
                 }
 
-                var mergeObjects = GlobalAttributesCache.GetMergeFields( this.CurrentPerson );
+                var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( this.RockPage, this.CurrentPerson );
                 var financialAccounts = new FinancialAccountService( rockContext ).Queryable().Select( a => new { a.Id, a.Name } ).ToDictionary( k => k.Id, v => v.Name );
 
                 var yearsMergeObjects = new List<Dictionary<string, object>>();
@@ -153,17 +154,17 @@ namespace RockWeb.Blocks.Finance
                     yearsMergeObjects.Add( yearDictionary );
                 }
 
-                mergeObjects.Add( "Rows", yearsMergeObjects );
+                mergeFields.Add( "Rows", yearsMergeObjects );
 
                 lLavaOutput.Text = string.Empty;
-                if ( GetAttributeValue( "EnableDebug" ).AsBooleanOrNull().GetValueOrDefault( false ) )
+                if ( GetAttributeValue( "EnableDebug" ).AsBoolean() && IsUserAuthorized( Authorization.EDIT ) )
                 {
-                    lLavaOutput.Text = mergeObjects.lavaDebugInfo( rockContext );
+                    lLavaOutput.Text = mergeFields.lavaDebugInfo( rockContext );
                 }
 
                 string template = GetAttributeValue( "LavaTemplate" );
 
-                lLavaOutput.Text += template.ResolveMergeFields( mergeObjects ).ResolveClientIds( upnlContent.ClientID );
+                lLavaOutput.Text += template.ResolveMergeFields( mergeFields ).ResolveClientIds( upnlContent.ClientID );
             }
         }
 

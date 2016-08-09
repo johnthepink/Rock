@@ -1,11 +1,11 @@
 ﻿// <copyright>
 // Copyright by the Spark Development Network
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Rock Community License (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+// http://www.rockrms.com/license
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -82,7 +82,15 @@ namespace Rock.Web.UI.Controls
         {
             get
             {
+                // first try to determine it from ViewState
                 var currentPickerMode = ViewState["CurrentPickerMode"] as LocationPickerMode?;
+
+                // if ViewState didn't know, try to get it from _hfCurrentPickerMode 
+                if ( !currentPickerMode.HasValue )
+                {
+                    currentPickerMode = _hfCurrentPickerMode.Value.ConvertToEnumOrNull<LocationPickerMode>();
+                }
+
                 if ( !currentPickerMode.HasValue )
                 {
                     if ( ( this.AllowedPickerModes & LocationPickerMode.Address ) == LocationPickerMode.Address )
@@ -111,6 +119,10 @@ namespace Rock.Web.UI.Controls
             set
             {
                 ViewState["CurrentPickerMode"] = value;
+                if ( _hfCurrentPickerMode != null )
+                {
+                    _hfCurrentPickerMode.Value = value.ConvertToString();
+                }
             }
 
         }
@@ -485,6 +497,8 @@ namespace Rock.Web.UI.Controls
             {
                 return;
             }
+
+            _hfCurrentPickerMode.Value = eventArgument;
 
             CurrentPickerMode = _hfCurrentPickerMode.Value.ConvertToEnum<LocationPickerMode>( LocationPickerMode.Named );
 

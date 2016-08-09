@@ -1,11 +1,11 @@
 ﻿// <copyright>
 // Copyright by the Spark Development Network
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Rock Community License (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+// http://www.rockrms.com/license
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -109,6 +109,38 @@ namespace Rock.Field.Types
         #endregion
 
         #region Filter Control
+
+        /// <summary>
+        /// Gets the filter value control with the specified FilterMode
+        /// </summary>
+        /// <param name="configurationValues">The configuration values.</param>
+        /// <param name="id">The identifier.</param>
+        /// <param name="required">if set to <c>true</c> [required].</param>
+        /// <param name="filterMode">The filter mode.</param>
+        /// <returns></returns>
+        public override Control FilterValueControl( Dictionary<string, ConfigurationValue> configurationValues, string id, bool required, FilterMode filterMode )
+        {
+            var control = new RockTextBox { ID = id };
+            control.ID = string.Format( "{0}_ctlCompareValue", id );
+            control.AddCssClass( "js-filter-control" );
+            return control;
+        }
+
+        /// <summary>
+        /// Formats the filter value value.
+        /// </summary>
+        /// <param name="configurationValues">The configuration values.</param>
+        /// <param name="value">The value.</param>
+        /// <returns></returns>
+        public override string FormatFilterValueValue( Dictionary<string, ConfigurationValue> configurationValues, string value )
+        {
+            if ( !string.IsNullOrWhiteSpace( value ) )
+            {
+                return string.Format( "'{0}'", value );
+            }
+
+            return string.Empty;
+        }
 
         /// <summary>
         /// Gets the type of the filter comparison.

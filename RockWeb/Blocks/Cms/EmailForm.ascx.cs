@@ -1,11 +1,11 @@
 ﻿// <copyright>
 // Copyright by the Spark Development Network
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Rock Community License (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+// http://www.rockrms.com/license
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -223,10 +223,9 @@ namespace RockWeb.Blocks.Cms
 
         private void ShowForm()
         {
-            var mergeObjects = GlobalAttributesCache.GetMergeFields( CurrentPerson );
-            mergeObjects.Add( "CurrentPerson", CurrentPerson );
+            var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( this.RockPage, this.CurrentPerson );
 
-            lEmailForm.Text = GetAttributeValue( "HTMLForm" ).ResolveMergeFields( mergeObjects );
+            lEmailForm.Text = GetAttributeValue( "HTMLForm" ).ResolveMergeFields( mergeFields );
         }
 
         private void SendEmail()
@@ -253,8 +252,7 @@ namespace RockWeb.Blocks.Cms
             if ( !isBot )
             {
                 // create merge objects
-                var mergeFields = GlobalAttributesCache.GetMergeFields( CurrentPerson );
-                mergeFields.Add( "CurrentPerson", CurrentPerson );
+                var mergeFields = Rock.Lava.LavaHelper.GetCommonMergeFields( this.RockPage, this.CurrentPerson );
 
                 // create merge object for fields
                 Regex rgxRockControls = new Regex( @"^ctl\d*\$.*" );

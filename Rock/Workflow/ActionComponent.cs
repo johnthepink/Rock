@@ -1,11 +1,11 @@
 ﻿// <copyright>
 // Copyright by the Spark Development Network
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Rock Community License (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+// http://www.rockrms.com/license
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -49,14 +49,8 @@ namespace Rock.Workflow
         /// <summary>
         /// Initializes a new instance of the <see cref="ActionComponent" /> class.
         /// </summary>
-        public ActionComponent()
+        public ActionComponent() : base( false )
         {
-            var type = this.GetType();
-            using ( var rockContext = new RockContext() )
-            {
-                int? actionTypeEntityTypeId = EntityTypeCache.Read( typeof( WorkflowActionType ) ).Id;
-                Rock.Attribute.Helper.UpdateAttributes( this.GetType(), actionTypeEntityTypeId, "EntityTypeId", Rock.Web.Cache.EntityTypeCache.GetId( type.FullName ).ToString(), rockContext );
-            }
         }
 
         /// <summary>
@@ -127,7 +121,35 @@ namespace Rock.Workflow
         /// <returns></returns>
         protected string GetAttributeValue( WorkflowAction action, string key )
         {
-            return GetActionAttributeValue( action, key );
+            return GetAttributeValue( action, key, false );
+        }
+
+        /// <summary>
+        /// Gets the attribute value.
+        /// </summary>
+        /// <param name="action">The action.</param>
+        /// <param name="key">The key.</param>
+        /// <param name="checkWorflowAttributeValue">if set to <c>true</c> and the returned value is a guid, check to see if the workflow 
+        /// or activity contains an attribute with that guid. This is useful when using the WorkflowTextOrAttribute field types to get the 
+        /// actual value or workflow value.</param>
+        /// <returns></returns>
+        protected string GetAttributeValue( WorkflowAction action, string key, bool checkWorflowAttributeValue )
+        {
+            string value = GetActionAttributeValue( action, key );
+            if ( checkWorflowAttributeValue )
+            {
+                Guid? attributeGuid = value.AsGuidOrNull();
+                if ( attributeGuid.HasValue )
+                {
+                    var attribute = AttributeCache.Read( attributeGuid.Value );
+                    if ( attribute != null )
+                    {
+                        return action.GetWorklowAttributeValue( attributeGuid.Value );
+                    }
+                }
+            }
+
+            return value;
         }
 
         /// <summary>
@@ -146,6 +168,7 @@ namespace Rock.Workflow
                 {
                     actionType.LoadAttributes();
                 }
+
                 var values = actionType.AttributeValues;
                 if ( values.ContainsKey( key ) )
                 {
@@ -196,19 +219,10 @@ namespace Rock.Workflow
         /// <returns></returns>
         protected Dictionary<string, object> GetMergeFields( WorkflowAction action )
         {
-            var mergeFields = Rock.Web.Cache.GlobalAttributesCache.GetMergeFields( null );
+            var mergeFields = Lava.LavaHelper.GetCommonMergeFields( null );
             mergeFields.Add( "Action", action );
             mergeFields.Add( "Activity", action.Activity );
             mergeFields.Add( "Workflow", action.Activity.Workflow );
-
-            if ( HttpContext.Current != null && HttpContext.Current.Items.Contains( "CurrentPerson" ) )
-            {
-                var currentPerson = HttpContext.Current.Items["CurrentPerson"] as Person;
-                if (currentPerson != null)
-                {
-                    mergeFields.Add( "CurrentPerson", currentPerson );
-                }
-            }
 
             return mergeFields;
         }

@@ -2,11 +2,11 @@
 // <copyright>
 // Copyright 2013 by the Spark Development Network
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Rock Community License (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
-// http://www.apache.org/licenses/LICENSE-2.0
+// http://www.rockrms.com/license
 //
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
@@ -99,10 +99,13 @@ public class Mailgun : IHttpHandler
 
             if ( !string.IsNullOrWhiteSpace( request.Form["communication_recipient_guid"] ) )
             {
-                Guid? communicationRecipientGuid = request.Form["communication_recipient_guid"].AsGuidOrNull();
+                // Split on comma if it exists to deal with MailGun issue 269764 (issue #1478)
+                Guid? communicationRecipientGuid = request.Form["communication_recipient_guid"].Split( ',' )[0].AsGuidOrNull();
                 if ( communicationRecipientGuid.HasValue )
                 {
                     var communicationRecipientService = new CommunicationRecipientService( rockContext );
+                    var communicationRecipientActivityService = new CommunicationRecipientActivityService( rockContext );
+
                     var communicationRecipient = communicationRecipientService.Get( communicationRecipientGuid.Value );
                     if ( communicationRecipient != null )
                     {
@@ -124,7 +127,9 @@ public class Mailgun : IHttpHandler
                                     request.Form["client-os"] ?? "unknown",
                                     request.Form["client-name"] ?? "unknown",
                                     request.Form["device-type"] ?? "unknown" );
+                                
                                 CommunicationRecipientActivity openActivity = new CommunicationRecipientActivity();
+                                openActivity.CommunicationRecipientId = communicationRecipient.Id;
                                 openActivity.ActivityType = "Opened";
                                 openActivity.ActivityDateTime = ts;
                                 openActivity.ActivityDetail = string.Format( "Opened from {0} using {1} {2} {3} {4}",
@@ -133,11 +138,12 @@ public class Mailgun : IHttpHandler
                                     request.Form["device-type"] ?? "",
                                     request.Form["client-name"] ?? "",
                                     request.Form["client-type"] ?? "" );
-                                communicationRecipient.Activities.Add( openActivity );
+                                communicationRecipientActivityService.Add( openActivity );
                                 break;
                                 
                             case "clicked":
                                 CommunicationRecipientActivity clickActivity = new CommunicationRecipientActivity();
+                                clickActivity.CommunicationRecipientId = communicationRecipient.Id;
                                 clickActivity.ActivityType = "Click";
                                 clickActivity.ActivityDateTime = ts;
                                 clickActivity.ActivityDetail = string.Format( "Clicked the address {0} from {1} using {2} {3} {4} {5}",
@@ -147,7 +153,7 @@ public class Mailgun : IHttpHandler
                                     request.Form["device-type"] ?? "",
                                     request.Form["client-name"] ?? "",
                                     request.Form["client-type"] ?? "" );
-                                communicationRecipient.Activities.Add( clickActivity );
+                                communicationRecipientActivityService.Add( clickActivity );
                                 break;
                                 
                             case "complained": break;
