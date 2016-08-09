@@ -303,6 +303,7 @@
     <Compile Include="Follow\EventContainer.cs" />
     <Compile Include="Jobs\CalculateFamilyAnalytics.cs" />
     <Compile Include="Jobs\IndexRockSite.cs" />
+    <Compile Include="Jobs\UniversalSearchBulkIndex.cs" />
     <Compile Include="Jobs\SendFollowingEvents.cs" />
     <Compile Include="Jobs\SendFollowingSuggestions.cs" />
     <Compile Include="Jobs\SendRegistrationPaymentReminders.cs" />
@@ -584,6 +585,7 @@
     <Compile Include="UniversalSearch\IndexModels\PersonIndex.cs" />
     <Compile Include="UniversalSearch\IndexModels\ContentChannelItemIndex.cs" />
     <Compile Include="UniversalSearch\IndexModels\IndexModelBase.cs" />
+    <Compile Include="UniversalSearch\IndexModels\GroupIndex.cs" />
     <Compile Include="UniversalSearch\IndexModels\SitePageIndex.cs" />
     <Compile Include="UniversalSearch\IRockIndexable.cs" />
     <Compile Include="UniversalSearch\SearchResultModel.cs" />

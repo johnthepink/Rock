@@ -32,6 +32,7 @@ using Rock.Security;
 using Newtonsoft.Json;
 using Rock.Web;
 using System.Web.UI.WebControls;
+using Rock.UniversalSearch;
 
 namespace RockWeb.Blocks.Cms
 {
@@ -529,6 +530,8 @@ namespace RockWeb.Blocks.Cms
         public void ShowDetail( int contentChannelId )
         {
             ContentChannel contentChannel = null;
+
+            cbIndexChannel.Visible = IndexContainer.IndexingEnabled;
 
             bool editAllowed = IsUserAuthorized( Authorization.EDIT );
 

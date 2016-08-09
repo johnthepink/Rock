@@ -9,6 +9,15 @@ namespace Rock.UniversalSearch
 {
     interface IRockIndexable
     {
+
+        /// <summary>
+        /// Gets a value indicating whether [allows interactive bulk indexing].
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if [allows interactive bulk indexing]; otherwise, <c>false</c>.
+        /// </value>
+        bool AllowsInteractiveBulkIndexing { get; }
+
         /// <summary>
         /// Bulks the index documents.
         /// </summary>

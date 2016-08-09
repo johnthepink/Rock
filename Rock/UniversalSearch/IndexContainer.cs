@@ -45,6 +45,14 @@ namespace Rock.UniversalSearch
             get { return instance.Value; }
         }
 
+        public static bool IndexingEnabled
+        {
+            get
+            {
+                return GetActiveComponent() != null;
+            }
+        }
+
         /// <summary>
         /// Gets the component with the matching Entity Type Name.
         /// </summary>

@@ -163,49 +163,5 @@ namespace RockWeb.Blocks.Cms
         }
 
         #endregion
-
-        private List<SearchResultModel> TempGetResults( ISearchResponse<dynamic> results)
-        {
-            
-            List<SearchResultModel> searchResults = new List<SearchResultModel>();
-            if ( results != null )
-            {
-                foreach ( var hit in results.Hits )
-                {
-                    var searchResult = new SearchResultModel();
-                    searchResult.Score = hit.Score;
-                    searchResult.Type = hit.Type;
-                    searchResult.Index = hit.Index;
-                    searchResult.EntityId = hit.Id.AsInteger();
-
-                    try
-                    {
-                        if ( hit.Source != null )
-                        {
-                            var typeName = (string)((JObject)hit.Source)["indexModelType"] + ",Rock";
-                            Type indexModelType = Type.GetType( typeName );
-
-                            if ( indexModelType != null )
-                            {
-                                searchResult.Document = (IndexModelBase)((JObject)hit.Source).ToObject( indexModelType ); // return the source document as the derived type
-                            }
-                            else
-                            {
-                                searchResult.Document = ((JObject)hit.Source).ToObject<IndexModelBase>(); // return the source document as the base type
-                            }
-                        }
-
-                        if ( hit.Explanation != null )
-                        {
-                            searchResult.Explain = hit.Explanation.ToJson();
-                        }
-
-                        searchResults.Add( searchResult );
-                    }
-                    catch { } // ignore if the result if an exception resulted (most likely cause is getting a result from a non-rock index)
-                }
-            }
-            return searchResults;
-        }
     }
 }

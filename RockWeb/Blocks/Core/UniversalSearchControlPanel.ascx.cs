@@ -156,6 +156,20 @@ namespace RockWeb.Blocks.Core
             {
                 var isIndexingEnabled = dataItem.GetPropertyValue( "IsIndexingEnabled" ).ToString().AsBoolean();
 
+                var entityAssembly = dataItem.GetPropertyValue( "AssemblyName" ).ToString();
+                Type modelType = Type.GetType( entityAssembly );
+
+                if (modelType != null )
+                {
+                    var modelInstance = Activator.CreateInstance( modelType );
+                    var supportBulkIndexing = (bool)modelType.GetProperty( "AllowsInteractiveBulkIndexing" ).GetValue( modelInstance, null );
+
+                    if ( !supportBulkIndexing )
+                    {
+                        e.Row.Cells[3].Controls[0].Visible = false;
+                    }
+                }
+
                 if ( !isIndexingEnabled )
                 {
                     var refreshCell = e.Row.Cells[2].Controls[0].Visible = false;
