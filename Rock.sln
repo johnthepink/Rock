@@ -45,6 +45,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rock.Version", "Rock.Versio
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rock.SignNow", "Rock.SignNow\Rock.SignNow.csproj", "{1F5956F2-2B0F-49B8-AAF1-2CC28F01426A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rock.Elasticsearch", "Rock.Elasticsearch\Rock.Elasticsearch.csproj", "{A08047B5-7467-4DFE-915E-501F5B7C6972}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -95,6 +97,10 @@ Global
 		{1F5956F2-2B0F-49B8-AAF1-2CC28F01426A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1F5956F2-2B0F-49B8-AAF1-2CC28F01426A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1F5956F2-2B0F-49B8-AAF1-2CC28F01426A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A08047B5-7467-4DFE-915E-501F5B7C6972}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A08047B5-7467-4DFE-915E-501F5B7C6972}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A08047B5-7467-4DFE-915E-501F5B7C6972}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A08047B5-7467-4DFE-915E-501F5B7C6972}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

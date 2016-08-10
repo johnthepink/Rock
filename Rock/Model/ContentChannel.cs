@@ -19,7 +19,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -273,7 +272,7 @@ namespace Rock.Model
         /// <param name="contentChannelId">The content channel identifier.</param>
         public void DeleteIndexedDocumentsByContentChannel( int contentChannelId )
         {
-            var contentItems = new ContentChannelItemService( new RockContext() ).Queryable().AsNoTracking()
+            var contentItems = new ContentChannelItemService( new RockContext() ).Queryable()
                                     .Where( i => i.ContentChannelId == contentChannelId );
 
             foreach ( var item in contentItems )
@@ -293,7 +292,7 @@ namespace Rock.Model
 
             // return all approved content channel items that are in content channels that should be indexed
             RockContext rockContext = new RockContext();
-            var contentChannelItems = new ContentChannelItemService( rockContext ).Queryable().AsNoTracking()
+            var contentChannelItems = new ContentChannelItemService( rockContext ).Queryable()
                                             .Where( i =>
                                                 i.ContentChannelId == contentChannelId
                                                 && (i.ContentChannel.RequiresApproval == false || i.Status == ContentChannelItemStatus.Approved) );
@@ -319,26 +318,7 @@ namespace Rock.Model
             {
                 ChildContentChannels.Clear();
             }
-        }
 
-        /// <summary>
-        /// Returns a <see cref="System.String" /> that represents this instance.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="System.String" /> that represents this instance.
-        /// </returns>
-        public override string ToString()
-        {
-            return this.Name;
-        }
-
-        /// <summary>
-        /// Pres the save.
-        /// </summary>
-        /// <param name="dbContext">The database context.</param>
-        /// <param name="state">The state.</param>
-        public override void PreSaveChanges( Rock.Data.DbContext dbContext, System.Data.Entity.EntityState state )
-        {
             // clean up the index
             if ( state == System.Data.Entity.EntityState.Deleted && IsIndexEnabled )
             {
@@ -351,13 +331,13 @@ namespace Rock.Model
                 if ( changeEntry != null )
                 {
                     var originalIndexState = (bool)changeEntry.OriginalValues["IsIndexEnabled"];
-                    
-                    if (originalIndexState == true && IsIndexEnabled == false )
+
+                    if ( originalIndexState == true && IsIndexEnabled == false )
                     {
                         // clear out index items
                         this.DeleteIndexedDocumentsByContentChannel( Id );
                     }
-                    else if (originalIndexState == false && IsIndexEnabled == true )
+                    else if ( originalIndexState == false && IsIndexEnabled == true )
                     {
                         // add items to the index
                         BulkIndexDocumentsByContentChannel( Id );
@@ -368,8 +348,16 @@ namespace Rock.Model
             base.PreSaveChanges( dbContext, state );
         }
 
-
-
+        /// <summary>
+        /// Returns a <see cref="System.String" /> that represents this instance.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="System.String" /> that represents this instance.
+        /// </returns>
+        public override string ToString()
+        {
+            return this.Name;
+        }
         #endregion
     }
 

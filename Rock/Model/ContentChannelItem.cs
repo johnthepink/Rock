@@ -19,7 +19,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Data.Entity;
 using System.Data.Entity.ModelConfiguration;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -264,7 +263,7 @@ namespace Rock.Model
 
             // return all approved content channel items that are in content channels that should be indexed
             RockContext rockContext = new RockContext();
-            var contentChannelItems = new ContentChannelItemService( rockContext ).Queryable().AsNoTracking()
+            var contentChannelItems = new ContentChannelItemService( rockContext ).Queryable()
                                             .Where( i =>
                                                 i.ContentChannel.IsIndexEnabled
                                                 && (i.ContentChannel.RequiresApproval == false || i.Status == ContentChannelItemStatus.Approved) );
