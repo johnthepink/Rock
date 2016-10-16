@@ -110,7 +110,7 @@ Commitment Amount: ${{ FinancialPledge.TotalAmount }}
 
 If you have any questions, please contact {{ GlobalAttribute.OrganizationEmail }}
 
-Thank-you,<br/>
+Thank you,<br/>
 {{ GlobalAttribute.OrganizationName }}  
 
 {{ GlobalAttribute.EmailFooter }}

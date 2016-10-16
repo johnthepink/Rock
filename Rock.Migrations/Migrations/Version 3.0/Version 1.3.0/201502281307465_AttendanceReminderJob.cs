@@ -78,7 +78,7 @@ namespace Rock.Migrations
 <br/>
 Please remember to enter attendance for your group meeting {% if today == occurrenceDate %}today{% else %}on {{ Occurrence | Date:'dddd' }}{% endif %}.<br/>
 <br/>
-Thank-you!<br/>
+Thank you!<br/>
 <br/>
 <table align=""left"" style=""width: 29%; min-width: 190px; margin-bottom: 12px;"" cellpadding=""0"" cellspacing=""0"">
  <tr>

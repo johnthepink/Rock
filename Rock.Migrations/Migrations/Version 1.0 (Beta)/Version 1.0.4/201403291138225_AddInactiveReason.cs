@@ -70,7 +70,7 @@ namespace Rock.Migrations
             // Attrib for BlockType: Email Preference:Not Involved Text
             AddBlockTypeAttribute("B3C076C7-1325-4453-9549-456C23702069","9C204CD0-1233-41C5-818A-C5DA439445AA","Not Involved Text","NotInvolvedText","","Text to display for the 'Not Involved' option.",3,@" I am no longer involved with {{ GlobalAttribute.OrganizationName }}.","2A01DED5-E06A-470C-A695-9B6A032F087C");
             // Attrib for BlockType: Email Preference:Success Text
-            AddBlockTypeAttribute("B3C076C7-1325-4453-9549-456C23702069","9C204CD0-1233-41C5-818A-C5DA439445AA","Success Text","SuccessText","","Text to display after user submits selection.",4,@"<h4>Thank-You</h4>We have saved your email preference.","46309218-6CDF-427D-BE45-B3DE6FAC1FE1");
+            AddBlockTypeAttribute("B3C076C7-1325-4453-9549-456C23702069","9C204CD0-1233-41C5-818A-C5DA439445AA","Success Text","SuccessText","","Text to display after user submits selection.",4,@"<h4>Thank You</h4>We have saved your email preference.","46309218-6CDF-427D-BE45-B3DE6FAC1FE1");
             // Attrib for BlockType: Email Preference:No Emails Text
             AddBlockTypeAttribute("B3C076C7-1325-4453-9549-456C23702069","9C204CD0-1233-41C5-818A-C5DA439445AA","No Emails Text","NoEmailsText","","Text to display for the 'No Emails' option.",2,@"I am still involved with {{ GlobalAttribute.OrganizationName }}, but do not want to receive emails of ANY kind.","3A2E8CB6-B8DD-4C86-ACF9-BD8BE21ABAF4");
             // Attrib for BlockType: Email Preference:No Mass Emails Text
@@ -94,7 +94,7 @@ namespace Rock.Migrations
             // Attrib Value for Block:Email Preference, Attribute:Reasons to Exclude Page: Email Preference, Site: Rock Solid Church
             AddBlockAttributeValue("1F73AE04-1CD3-49E0-900C-0D19371EEEC0","2FB90DF2-BB7F-4AEA-985E-CB56FB3173F4",@"No Activity,Deceased");
             // Attrib Value for Block:Email Preference, Attribute:Success Text Page: Email Preference, Site: Rock Solid Church
-            AddBlockAttributeValue("1F73AE04-1CD3-49E0-900C-0D19371EEEC0","46309218-6CDF-427D-BE45-B3DE6FAC1FE1",@"<h4>Thank-You</h4>We have saved your email preference.");
+            AddBlockAttributeValue("1F73AE04-1CD3-49E0-900C-0D19371EEEC0","46309218-6CDF-427D-BE45-B3DE6FAC1FE1",@"<h4>Thank You</h4>We have saved your email preference.");
         }
         
         /// <summary>

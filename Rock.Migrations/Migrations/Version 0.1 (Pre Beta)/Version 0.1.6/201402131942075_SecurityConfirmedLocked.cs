@@ -36,7 +36,7 @@ namespace Rock.Migrations
             // Attrib for BlockType: Login:Confirm Account Template
             AddBlockTypeAttribute( "7B83D513-1178-429E-93FF-E76430E038E4", "CE7CA048-551C-4F68-8C0A-FCDCBEB5B956", "Confirm Account Template", "ConfirmAccountTemplate", "", "Confirm Account Email Template", 4, @"17aaceef-15ca-4c30-9a3a-11e6cf7e6411", "7D76CF1B-DFC7-47C0-AB55-C5CBDFAC811D" );
             // Attrib for BlockType: Login:Confirm Caption
-            AddBlockTypeAttribute( "7B83D513-1178-429E-93FF-E76430E038E4", "9C204CD0-1233-41C5-818A-C5DA439445AA", "Confirm Caption", "ConfirmCaption", "", "", 2, @"Thank-you for logging in, however, we need to confirm the email associated with this account belongs to you. We've sent you an email that contains a link for confirming.  Please click the link in your email to continue.", "9B22FDA2-A821-4CD6-9ED6-C95DD9E04107" );
+            AddBlockTypeAttribute( "7B83D513-1178-429E-93FF-E76430E038E4", "9C204CD0-1233-41C5-818A-C5DA439445AA", "Confirm Caption", "ConfirmCaption", "", "", 2, @"Thank you for logging in, however, we need to confirm the email associated with this account belongs to you. We've sent you an email that contains a link for confirming.  Please click the link in your email to continue.", "9B22FDA2-A821-4CD6-9ED6-C95DD9E04107" );
 
             // **** Not sure why these attributes were missing, but they appear to never have had a migration to create them.
             // Attrib for BlockType: New Account:Forgot Username
@@ -51,14 +51,14 @@ namespace Rock.Migrations
             UpdateBlockTypeAttribute( "734DFF21-7465-4E02-BFC3-D40F7A65FB60", "BD53F9C9-EBA9-4D3F-82EA-DE5DD34A8108", "New Account Page", "NewAccountPage", "", "Page to navigate to when user selects 'Create New Account' option (if blank will use 'NewAccount' page route)", 0, @"", "A2BD1864-BCF1-4A7C-B21B-220A46D22290" );
 
             // Attrib Value for Block:Login, Attribute:Confirm Caption Page: Login, Site: Rock RMS
-            AddBlockAttributeValue( "3D325BB3-E1C9-4194-8E9B-11BFFC347DC3", "9B22FDA2-A821-4CD6-9ED6-C95DD9E04107", @"Thank-you for logging in, however, we need to confirm the email associated with this account belongs to you. We've sent you an email that contains a link for confirming.  Please click the link in your email to continue." );
+            AddBlockAttributeValue( "3D325BB3-E1C9-4194-8E9B-11BFFC347DC3", "9B22FDA2-A821-4CD6-9ED6-C95DD9E04107", @"Thank you for logging in, however, we need to confirm the email associated with this account belongs to you. We've sent you an email that contains a link for confirming.  Please click the link in your email to continue." );
             // Attrib Value for Block:Login, Attribute:Confirm Account Template Page: Login, Site: Rock RMS
             AddBlockAttributeValue( "3D325BB3-E1C9-4194-8E9B-11BFFC347DC3", "7D76CF1B-DFC7-47C0-AB55-C5CBDFAC811D", @"17aaceef-15ca-4c30-9a3a-11e6cf7e6411" );
             // Attrib Value for Block:Login, Attribute:Locked Out Caption Page: Login, Site: Rock RMS
             AddBlockAttributeValue( "3D325BB3-E1C9-4194-8E9B-11BFFC347DC3", "BD6CB735-C86A-4D0D-BDA8-FBF1AAA261E9", @"Sorry, your account has temporarily been locked.  Please contact our office get it reactivated." );
             
             // Attrib Value for Block:Login, Attribute:Confirm Caption Page: Login, Site: Rock Solid Church
-            AddBlockAttributeValue( "A8E221F0-DE4E-4B0F-B660-BC7AC2298EF8", "9B22FDA2-A821-4CD6-9ED6-C95DD9E04107", @"Thank-you for logging in, however, we need to confirm the email associated with this account belongs to you. We've sent you an email that contains a link for confirming.  Please click the link in your email to continue." );
+            AddBlockAttributeValue( "A8E221F0-DE4E-4B0F-B660-BC7AC2298EF8", "9B22FDA2-A821-4CD6-9ED6-C95DD9E04107", @"Thank you for logging in, however, we need to confirm the email associated with this account belongs to you. We've sent you an email that contains a link for confirming.  Please click the link in your email to continue." );
             // Attrib Value for Block:Login, Attribute:Confirm Account Template Page: Login, Site: Rock Solid Church
             AddBlockAttributeValue( "A8E221F0-DE4E-4B0F-B660-BC7AC2298EF8", "7D76CF1B-DFC7-47C0-AB55-C5CBDFAC811D", @"17aaceef-15ca-4c30-9a3a-11e6cf7e6411" );
             // Attrib Value for Block:Login, Attribute:Locked Out Caption Page: Login, Site: Rock Solid Church
