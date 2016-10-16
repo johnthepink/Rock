@@ -12840,7 +12840,7 @@
             <summary>Whether to display detailed information about shard recovery</summary>
         </member>
         <member name="P:Nest.RecoveryStatusRequest.ActiveOnly">
-            <summary>Display only those recoveries that are currently on-going</summary>
+            <summary>Display only those recoveries that are currently ongoing</summary>
         </member>
         <member name="P:Nest.RecoveryStatusRequest.Human">
             <summary>Whether to return time and byte values in human-readable format.</summary>
@@ -12870,7 +12870,7 @@
             <summary>Whether to display detailed information about shard recovery</summary>
         </member>
         <member name="M:Nest.RecoveryStatusDescriptor.ActiveOnly(System.Boolean)">
-            <summary>Display only those recoveries that are currently on-going</summary>
+            <summary>Display only those recoveries that are currently ongoing</summary>
         </member>
         <member name="M:Nest.RecoveryStatusDescriptor.Human(System.Boolean)">
             <summary>Whether to return time and byte values in human-readable format.</summary>

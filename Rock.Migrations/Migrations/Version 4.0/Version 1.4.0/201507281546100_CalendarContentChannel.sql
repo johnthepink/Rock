@@ -65,7 +65,7 @@ SET [Subject] = 'New Pending Group Members | {{ ''Global''  | Attribute:''Organi
 </p>
 
 <p>
-    Thank you for your on-going commitment to {{ ''Global'' | Attribute:''OrganizationName'' }}.
+    Thank you for your ongoing commitment to {{ ''Global'' | Attribute:''OrganizationName'' }}.
 </p>
 
 {{ ''Global'' | Attribute:''EmailFooter'' }}'

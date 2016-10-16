@@ -2511,7 +2511,7 @@
             <summary>Whether to display detailed information about shard recovery</summary>
         </member>
         <member name="M:Elasticsearch.Net.RecoveryStatusRequestParameters.ActiveOnly(System.Boolean)">
-            <summary>Display only those recoveries that are currently on-going</summary>
+            <summary>Display only those recoveries that are currently ongoing</summary>
         </member>
         <member name="M:Elasticsearch.Net.RecoveryStatusRequestParameters.Human(System.Boolean)">
             <summary>Whether to return time and byte values in human-readable format.</summary>

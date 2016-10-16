@@ -54,7 +54,7 @@
 </p>
 
 <p>
-    Thank you for your on-going commitment to {{ ''Global'' | Attribute:''OrganizationName'' }}.
+    Thank you for your ongoing commitment to {{ ''Global'' | Attribute:''OrganizationName'' }}.
 </p>
 
 {{ ''Global'' | Attribute:''EmailFooter'' }}', '18521B26-1C7D-E287-487D-97D176CA4986', @CategoryId )
